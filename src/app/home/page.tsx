@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-
+import IBSpotlight from "@/components/home/Spotlight";
 import HomeHeader from "@/components/home/Header";
 import CategoryFilterBar from "@/components/home/CategoryFilterBar";
 import { useProfile } from "@/hooks/useProfile";
@@ -16,7 +16,7 @@ export default function HomePage() {
     const { profile, loading } = useProfile(user?.id);
     const router = useRouter();
 
-    const [locationName, setLocationName] = useState("Alaka, Lagos");
+    const [locationName, setLocationName] = useState("Bodija, Oyo");
     const [coords, setCoords] = useState<{ lat?: number; lng?: number }>({});
 
     useEffect(() => {
@@ -59,6 +59,9 @@ export default function HomePage() {
                 location={locationName}
             />
 
+            <IBSpotlight
+                userName="Mudi"
+                userLocation="Lekki Phase 1" />
             <div className="p-4 max-w-lg mx-auto">
                 <CategoryFilterBar onFilterSelect={(id) => console.log(id)} />
             </div>
