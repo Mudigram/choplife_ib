@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useSpotlight } from "@/hooks/useSpotlight";
-import { MapPin, Clock } from "lucide-react";
+import { MapPin } from "lucide-react";
 import type { FeaturedSpotlight } from "@/types/spotlights";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,10 +20,12 @@ export default function IBSpotlight({
     if (error) return null;   // optional: show fallback UI
     if (!spotlight || spotlight.length === 0) return null;
 
+
+
     return (
         <section className="w-full px-4 mt-4">
             <h2 className="text-lg text-white font-semibold mb-2">
-                Featured For You
+                IB Spotlights
             </h2>
 
             <div className="flex space-x-4 overflow-x-auto scrollbar-none pb-2 snap-x snap-mandatory">
@@ -50,60 +52,77 @@ function SpotlightCard({
     userName?: string;
     userLocation?: string;
 }) {
-    /* Personalized hook logic */
-    let personalizedHook = item.headline;
-
-    if (userName) {
-        personalizedHook = `Welcome Back, ${userName}! ${item.headline}`;
-    }
+    const personalizedHook = userName
+        ? `Welcome Back, ${userName}! ${item.headline}`
+        : item.headline;
 
     return (
-        <div className="min-w-[260px] rounded-2xl snap-center bg-chop-bg-card backdrop-blur-md border border-white/10 shadow-xl overflow-hidden relative">
-            {/* Image */}
-            <div className="h-40 w-full relative">
+        <div
+            className="
+          group relative min-w-[340px] h-[170px] rounded-2xl overflow-hidden snap-center 
+          bg-chop-bg-card backdrop-blur-xl border border-white/10 shadow-xl
+          transition-all duration-500 ease-out
+          hover:rotate-[1.3deg] hover:scale-[1.02]
+        "
+        >
+            {/* Parallax Image */}
+            <div className="absolute inset-0 overflow-hidden">
                 <Image
                     src={item.image_url}
-                    fill
                     alt={item.partner_name}
-                    className="h-full w-full object-cover"
+                    fill
+                    className="
+              object-cover transition-transform duration-700
+              group-hover:scale-110 group-hover:translate-x-2
+            "
                 />
             </div>
 
-            {/* Content */}
-            <div className="p-4 space-y-2">
-                <h3 className="text-white font-bold text-lg leading-tight">
-                    {item.partner_name}
-                </h3>
+            {/* Dark gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
 
-                <p className="text-chop-accent-cta font-medium text-sm">
-                    {personalizedHook}
-                </p>
+            {/* CONTENT LAYER */}
+            <div className="absolute inset-0 flex flex-col justify-between p-4">
 
-                {item.sub_text && (
-                    <p className="text-chop-text-subtle text-xs">{item.sub_text}</p>
-                )}
-
-                {/* Location/Time Cues */}
-                <div className="flex items-center text-xs text-gray-400 mt-1">
-                    <MapPin size={14} className="mr-1 text-chop-accent-point" />
+                {/* Top-left Location */}
+                <div className="flex items-center text-white/80 text-xs">
+                    <MapPin size={14} className="text-chop-accent-point mr-1" />
                     {userLocation || "Lagos"}
                 </div>
 
-                {item.target_type === "party" && (
-                    <div className="flex items-center text-xs text-gray-400">
-                        <Clock size={14} className="mr-1 text-chop-accent-status" />
-                        Tonight @ 9PM
-                    </div>
-                )}
+                {/* Middle section */}
+                <div>
+                    <h3 className="text-white font-bold text-xl drop-shadow">
+                        {item.partner_name}
+                    </h3>
 
-                {/* CTA */}
-                <Link
-                    href={`/${item.target_type}/${item.target_slug_id}`}
-                    className="block w-full text-center bg-chop-accent-cta hover:bg-chop-accent-cta/80 text-white font-semibold py-2 mt-3 rounded-lg shadow-[var(--shadow-neon-cta)] transition"
-                >
-                    {item.cta_text}
-                </Link>
+                    <p className="text-chop-accent-cta text-sm mt-1 drop-shadow">
+                        {personalizedHook}
+                    </p>
+                </div>
+
+                {/* Bottom Row (CTA & Subtext) */}
+                <div className="flex items-end justify-between w-full">
+                    {/* CTA Button */}
+                    <Link
+                        href={`/${item.target_type}/${item.target_slug_id}`}
+                        className="
+                bg-chop-accent-cta text-white text-sm font-semibold
+                py-1.5 px-3 rounded-md shadow-[var(--shadow-neon-cta)]
+                hover:bg-chop-accent-cta/80 transition
+              "
+                    >
+                        {item.cta_text}
+                    </Link>
+
+                    {item.sub_text && (
+                        <p className="text-white/70 text-[11px] max-w-[120px] text-right">
+                            {item.sub_text}
+                        </p>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
+

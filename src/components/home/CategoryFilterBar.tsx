@@ -36,7 +36,7 @@ export default function CategoryFilterBar({ onFilterSelect }: CategoryFilterBarP
         // Outer container for the filter bar
         // Uses `overflow-x-auto` to enable horizontal scrolling on mobile
         <div className="w-full bg-chop-bg-dark pt-2 pb-4">
-            <div className="flex space-x-3 overflow-x-auto scrollbar-hide px-4 max-w-lg mx-auto">
+            <div className="flex space-x-3 overflow-x-auto overflow-hidden px-4 max-w-lg mx-auto">
 
                 {MOCK_CATEGORIES.map((category) => (
                     <button
