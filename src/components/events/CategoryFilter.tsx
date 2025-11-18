@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { EVENT_CATEGORIES } from "@/data/eventCategories";
+import { useEventsByCategory } from "@/hooks/useEventsByCategory";
 import { EventCategory } from "@/types/events";
 
-export default function EventCategoryBar() {
-    const [activeCategory, setActiveCategory] = useState<EventCategory>(
-        EventCategory.ALL
-    );
+interface Props {
+    selected: string;
+    onSelect: (cat: string) => void;
+}
 
+export default function EventCategoryBar({ selected, onSelect }: Props) {
     return (
         <div
             className="
@@ -19,12 +20,12 @@ export default function EventCategoryBar() {
         >
             {EVENT_CATEGORIES.map((cat) => {
                 const Icon = cat.icon;
-                const isActive = activeCategory === cat.id;
+                const isActive = selected === cat.id;
 
                 return (
                     <button
                         key={cat.id}
-                        onClick={() => setActiveCategory(cat.id)}
+                        onClick={() => onSelect(cat.id)}
                         className={`
               flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium
               transition-all border

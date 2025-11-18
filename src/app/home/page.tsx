@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Spinner from "@/components/ui/Spinner";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import IBSpotlight from "@/components/home/Spotlight";
@@ -37,8 +38,8 @@ export default function HomePage() {
 
     if (loading || !user) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-chop-bg-dark">
-                <div className="text-chop-text-light">Loading home feed...</div>
+            <div className="w-full min-h-screen bg-chop-bg-dark text-center p-6">
+                <Spinner size="lg" message="Loading HomePage" full />
             </div>
         );
     }

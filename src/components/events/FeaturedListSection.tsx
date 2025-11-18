@@ -1,14 +1,18 @@
 import React from "react";
 import FeaturedEvents from "./FeaturedEvents";
 import { CircleArrowRight } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
     title: string;
     text: string;
+    slug: string;
     events: any[];
+    loading?: boolean;
+    error?: string | null;
 };
 
-export default function FeaturedListSection({ title, text, events }: Props) {
+export default function FeaturedListSection({ slug, title, text, events }: Props) {
     if (!events || events.length === 0) return null;
 
     // Group events into pairs (2 per vertical column)
@@ -20,12 +24,14 @@ export default function FeaturedListSection({ title, text, events }: Props) {
     return (
         <section className="mt-6">
             {/* SECTION HEADER */}
-            <div className="flex items-center">
-                <h2 className="text-lg font-bold mr-6">{title}</h2>
-                <button className="text-chop-accent-point text-sm">
-                    <CircleArrowRight />
-                </button>
-            </div>
+            <Link href={`/events/${slug}`}>
+                <div className="flex items-center">
+                    <h2 className="text-lg font-bold mr-6">{title}</h2>
+                    <button className="text-chop-accent-point text-sm">
+                        <CircleArrowRight />
+                    </button>
+                </div>
+            </Link>
 
             <p className="text-sm font-light mb-3">{text}</p>
 

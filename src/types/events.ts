@@ -1,23 +1,37 @@
+// -------------------------
+// EVENT CATEGORY ENUMS
+// -------------------------
 export enum EventCategory {
   ALL = "all",
-  MUSIC = "music",
-  FOOD = "food",
-  ART = "art",
-  NETWORKING = "networking",
-  WELLNESS = "wellness",
+  TECH = "Tech",
+  MUSIC = "Music",
+  ART = "Art",
+  PARTY = "Party",
+  COMEDY = "Comedy",
+  FITNESS = "Fitness",
+  LIFESTYLE_FUN = "Lifestyle Fun",
+  SPORTS = "Sports",
+  MOVIE = "Movie",
 }
 
+// -------------------------
+// EVENT TABS ENUM
+// -------------------------
 export enum EventTab {
   UPCOMING = "upcoming",
   SAVED = "saved",
   PAST = "past",
 }
 
+// -------------------------
+// CARD DISPLAY DATA (UI Shaped)
+// -------------------------
 export interface EventCardData {
   id: string;
   title: string;
   image_url: string;
-  category: EventCategory;
+  // category comes from the DB as a string; prefer a union to allow both raw strings and enum values
+  category: string | EventCategory;
   location: string;
   price: number | "free";
   time: string;
@@ -29,13 +43,61 @@ export interface EventCardData {
   slug: string;
 }
 
+// -------------------------
+// DATABASE TYPES (Supabase)
+// Matches your ibadan_events schema
+// -------------------------
+export interface IbadanEvent {
+  id: number;
+  created_at: string;
+  title: string;
+  description: string | null;
+  image_url: string;
+  venue: string;
+  location: string;
+  city: string;
+  start_date_time: string;
+  end_date_time: string | null;
+  price_ngn: number;
+  category: string | null;
+  organizer_id: string | null;
+  is_verified: boolean;
+  ticket_link: string | null;
+}
+
+// -------------------------
+// EVENT SECTION TABLE (supabase)
+// -------------------------
+export interface EventSection {
+  id: number;
+  section_slug: string;
+  event_id: number;
+  priority: number;
+  created_at: string;
+}
+
+// -------------------------
+// COMBINED RESULT FOR HOOK
+// -------------------------
+export interface SectionWithEvents {
+  section: string;
+  events: IbadanEvent[];
+}
+
+// -------------------------
+// CONSTANTS FOR FILTER UI
+// -------------------------
 export const EVENT_CATEGORIES = [
-  { key: "all", label: "All", icon: "🔥" },
-  { key: "music", label: "Music", icon: "🎵" },
-  { key: "food", label: "Food & Drink", icon: "🍔" },
-  { key: "art", label: "Art & Culture", icon: "🎨" },
-  { key: "networking", label: "Networking", icon: "🤝" },
-  { key: "wellness", label: "Wellness", icon: "🧘" },
+  { key: EventCategory.ALL, label: "All", icon: "🔥" },
+  { key: EventCategory.TECH, label: "Tech", icon: "💻" },
+  { key: EventCategory.MUSIC, label: "Music", icon: "�" },
+  { key: EventCategory.ART, label: "Art & Culture", icon: "🎨" },
+  { key: EventCategory.PARTY, label: "Party", icon: "🎉" },
+  { key: EventCategory.COMEDY, label: "Comedy", icon: "🎭" },
+  { key: EventCategory.FITNESS, label: "Fitness", icon: "🏃" },
+  { key: EventCategory.LIFESTYLE_FUN, label: "Lifestyle Fun", icon: "✨" },
+  { key: EventCategory.SPORTS, label: "Sports", icon: "🏅" },
+  { key: EventCategory.MOVIE, label: "Movie", icon: "🎬" },
 ];
 
 export const SORT_OPTIONS = [
@@ -45,62 +107,3 @@ export const SORT_OPTIONS = [
   { key: "soon", label: "Starting Soonest" },
   { key: "newest", label: "Newest Added" },
 ];
-
-// export const mockEvents: EventItem[] = [
-//   {
-//     id: "1",
-//     title: "Palmwine & Chill: Lagos Edition",
-//     description: "Good music, palmwine tasting, and live DJ sets.",
-//     date: "2025-11-20T19:00:00.000Z",
-//     location: "Lekki Phase 1",
-//     price: "₦10,000",
-//     imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-//     category: EventCategory.Music,
-//     createdAt: "2025-10-01T12:00:00.000Z",
-//   },
-//   {
-//     id: "2",
-//     title: "Art & Wine Sip Session",
-//     description: "A guided art experience with premium wine tasting.",
-//     date: "2025-11-05T16:00:00.000Z",
-//     location: "Ikoyi",
-//     price: "₦15,000",
-//     imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-//     category: EventCategory.ArtCulture,
-//     createdAt: "2025-10-02T09:00:00.000Z",
-//     isSaved: true,
-//   },
-//   {
-//     id: "3",
-//     title: "Outdoor Fitness Bootcamp",
-//     description: "High-energy cardio + strength training.",
-//     date: "2025-10-10T07:00:00.000Z", // past event
-//     location: "Bodija",
-//     price: "₦3,000",
-//     imageUrl: "https://images.unsplash.com/photo-1554284126-aa88f22d8b74",
-//     category: EventCategory.Wellness,
-//     createdAt: "2025-09-15T08:00:00.000Z",
-//   },
-//   {
-//     id: "4",
-//     title: "Food Lovers Festival",
-//     description: "Over 40 food vendors. Taste, eat, relax.",
-//     date: "2025-12-15T12:00:00.000Z",
-//     location: "Ring Road",
-//     price: "₦2,000",
-//     imageUrl: "https://images.unsplash.com/photo-1464195643332-1f39524e4600",
-//     category: EventCategory.FoodDrink,
-//     createdAt: "2025-10-03T15:00:00.000Z",
-//   },
-//   {
-//     id: "5",
-//     title: "Tech Mixer: IB Connects",
-//     description: "Networking event for founders & developers.",
-//     date: "2025-11-10T17:00:00.000Z",
-//     location: "UI Gate",
-//     price: "Free",
-//     imageUrl: "https://images.unsplash.com/photo-1515169067865-5387ec356754",
-//     category: EventCategory.Networking,
-//     createdAt: "2025-10-04T11:00:00.000Z",
-//   },
-// ];

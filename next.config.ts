@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       "placehold.co",
       "tyivppecifemhowhtyxb.supabase.co",
       "ui-avatars.com",
+      "images.pexels.com",
     ],
   },
 };

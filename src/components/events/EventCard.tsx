@@ -12,6 +12,10 @@ type Category =
     | "wellness"
     | "default";
 
+interface EventCardProps {
+    event: Record<string, unknown>;
+}
+
 const CATEGORY_COLORS: Record<Category, string> = {
     music: "from-pink-500 to-purple-500",
     food: "from-orange-400 to-yellow-500",
@@ -21,8 +25,30 @@ const CATEGORY_COLORS: Record<Category, string> = {
     default: "from-gray-500 to-gray-700",
 };
 
-export default function EventCard({ event }: { event: any }) {
+export default function EventCard({ event }: EventCardProps) {
+    /** Map Supabase field names to display values */
+    const imageUrl = (event.image_url as string) || (event.image as string) || "/assets/placeholder.png";
+    const title = (event.title as string) || "Untitled Event";
 
+    // Parse start_date_time from Supabase (ISO format)
+    let eventDate = "TBD";
+    let eventTime = "TBD";
+    if (event.start_date_time && typeof event.start_date_time === "string") {
+        try {
+            const dateObj = new Date(event.start_date_time);
+            eventDate = dateObj.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric"
+            });
+            eventTime = dateObj.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        } catch {
+            console.error("Failed to parse date:", event.start_date_time);
+        }
+    }
 
     /** Pick category glow */
     const glowColor =
@@ -50,7 +76,7 @@ export default function EventCard({ event }: { event: any }) {
             <div
                 className={`
           absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-40 blur-md 
-          bg-gradient-to-r ${glowColor} transition duration-500
+          bg-linear-to-r ${glowColor} transition duration-500
         `}
             ></div>
 
@@ -65,8 +91,8 @@ export default function EventCard({ event }: { event: any }) {
                 {/* IMAGE */}
                 <div className="relative h-40 w-full overflow-hidden">
                     <Image
-                        src={event.image}
-                        alt={event.title}
+                        src={imageUrl}
+                        alt={title}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
@@ -79,14 +105,14 @@ export default function EventCard({ event }: { event: any }) {
 
                 {/* CONTENT */}
                 <div className="p-3">
-                    <h3 className="text-base font-bold">{event.title}</h3>
+                    <h3 className="text-base font-bold">{title}</h3>
 
                     {/* Date */}
                     <div className="flex items-center text-gray-400 text-sm mt-1">
                         <Calendar size={12} className="mr-1" />
-                        {event.date},
+                        {eventDate},
                         <Clock size={12} className="ml-1" />
-                        {event.time}
+                        {eventTime}
                     </div>
 
                 </div>

@@ -73,7 +73,7 @@ export default function HomeHeader({ user, location }: HomeHeaderProps) {
                             {/* Location Button */}
                             <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="flex backdrop-blur-md bg-white/10 border border-white/20 rounded-full px-3 py-1.5 items-center text-sm text-orange-600 transition-colors hover:bg-white/20"
+                                className="flex backdrop-blur-md bg-white/10 border border-white/20 rounded-full px-3 py-1.5 items-center text-sm text-chop-accent-cta transition-colors hover:bg-white/20"
                             >
                                 <MapPin className="h-4 w-4 mr-2" />
                                 <span className="">{location || "Select Location"}</span>
@@ -106,7 +106,7 @@ export default function HomeHeader({ user, location }: HomeHeaderProps) {
                                 style={{ fontSize: "16px" }}
                             />
                             <Button variant="ghost" aria-label="Filters" className="p-1">
-                                <SlidersHorizontal className="h-4 w-4 text-orange-600" />
+                                <SlidersHorizontal className="h-4 w-4 text-chop-accent-cta" />
                             </Button>
                         </div>
                     </div>

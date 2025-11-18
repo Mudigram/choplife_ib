@@ -6,9 +6,90 @@ import EventCategoryBar from "@/components/events/CategoryFilter";
 import SearchBar from "@/components/events/SearchBar";
 import EventList from "@/components/events/EventsList";
 import FeaturedListSection from "@/components/events/FeaturedListSection";
-import { SampleEvents } from "@/data/sampleEvents";
+import { useEvents } from "@/hooks/useEvents";
+import { useEventSection } from "@/hooks/useEventSections";
+import Spinner from "@/components/ui/Spinner";
+import EventListSection from "@/components/events/EventListSection";
+// types: Event shapes are flexible (from useEvents hook)
 
 export default function EventsPage() {
+    /** 🔥 Fetch all events */
+    const {
+        events: allEvents,
+        loading,
+        error,
+    } = useEvents();
+
+    /** 🔥 UI State */
+    const [category, setCategory] = React.useState<string>("all");
+    const [search, setSearch] = React.useState<string>("");
+
+    /** 🔥 Filtered Events */
+    const filteredEvents = React.useMemo(() => {
+        return allEvents.filter(event => {
+            const matchesCategory =
+                category === "all" ? true : event.category === category;
+
+            const matchesSearch =
+                search.trim() === "" ||
+                event.title.toLowerCase().includes(search.toLowerCase());
+
+            return matchesCategory && matchesSearch;
+        });
+    }, [allEvents, category, search]);
+
+    /** 🔥 Fetch Supabase featured sections */
+    const trending = useEventSection("trending-around-you");
+    const hotWeek = useEventSection("hot-this-week");
+    const favorites = useEventSection("top-favorites");
+
+    /** 🔥 Filter featured section events by category */
+    const filteredTrending = React.useMemo(() => {
+        if (!trending.data?.events) return [];
+        return category === "all"
+            ? trending.data.events
+            : trending.data.events.filter(event => event.category === category);
+    }, [trending.data, category]);
+
+    const filteredHotWeek = React.useMemo(() => {
+        if (!hotWeek.data?.events) return [];
+        return category === "all"
+            ? hotWeek.data.events
+            : hotWeek.data.events.filter(event => event.category === category);
+    }, [hotWeek.data, category]);
+
+    const filteredFavorites = React.useMemo(() => {
+        if (!favorites.data?.events) return [];
+        return category === "all"
+            ? favorites.data.events
+            : favorites.data.events.filter(event => event.category === category);
+    }, [favorites.data, category]);
+
+    /** 🔥 Loading & Error */
+    if (loading) {
+        return (
+            <div className="w-full min-h-screen bg-chop-bg-dark text-center p-6">
+                <Spinner size="lg" message="Loading Events" full />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center text-chop-accent-error p-6">
+                Error loading events: {error}
+            </div>
+        );
+    }
+
+    if (allEvents.length === 0) {
+        return (
+            <div className="text-center text-chop-text-subtle p-6">
+                <p>No events currently available yet.</p>
+            </div>
+        );
+    }
+
     return (
         <main className="w-full min-h-screen bg-chop-bg-dark text-white pb-20">
             <div className="max-w-lg mx-auto px-4">
@@ -21,38 +102,59 @@ export default function EventsPage() {
                     </p>
                 </header>
 
-                {/* SEARCH BAR (NOT sticky) */}
+                {/* SEARCH BAR */}
                 <div className="mt-2 mb-3">
-                    <SearchBar />
+                    <SearchBar value={search} onChange={setSearch} />
                 </div>
 
-                {/* STICKY FILTER ZONE */}
-                <div className="sticky top-0 z-[50] bg-chop-bg-dark/95 backdrop-blur-md pb-3 pt-2">
+                {/* FILTER ZONE */}
+                <div className="sticky top-0 z-50 bg-chop-bg-dark/95 backdrop-blur-md pb-3 pt-2">
 
-                    {/* EVENT TABS */}
                     <EventTabs />
 
-                    {/* CATEGORY FILTER SCROLLER */}
                     <div className="mt-2">
-                        <EventCategoryBar />
+                        <EventCategoryBar
+                            selected={category}
+                            onSelect={(cat) => setCategory(cat)}
+                        />
                     </div>
                 </div>
 
-                {/* CONTENT FEED */}
+                {/* CONTENT */}
                 <section className="mt-4">
-                    <EventList />
-                    <FeaturedListSection title="Trending Around You"
-                        text='Best Recc and Promoted events'
-                        events={SampleEvents.aroundYou} />
-                    <FeaturedListSection title="Trending Around You"
-                        text='Best Recc and Promoted events'
-                        events={SampleEvents.trending} />
-                    <FeaturedListSection title="Trending Around You"
-                        text='Best Recc and Promoted events'
-                        events={SampleEvents.hot} />
-                    <EventList />
-                </section>
 
+                    {/* MAIN EVENT LIST (FILTERED) */}
+                    <EventList events={filteredEvents} />
+
+                    <FeaturedListSection
+                        title="Trending Around You"
+                        text="Best Rec and promoted events"
+                        slug="trending-around-you"
+                        loading={trending.loading}
+                        error={trending.error}
+                        events={filteredTrending}
+                    />
+
+                    <FeaturedListSection
+                        title="Hot this Week"
+                        text="Most active events this week"
+                        slug="hot-this-week"
+                        loading={hotWeek.loading}
+                        error={hotWeek.error}
+                        events={filteredHotWeek}
+                    />
+
+                    <FeaturedListSection
+                        title="Top Favorites"
+                        text="Most saved and trending"
+                        slug="top-favorites"
+                        loading={favorites.loading}
+                        error={favorites.error}
+                        events={filteredFavorites}
+                    />
+
+                    <EventList events={filteredEvents} />
+                </section>
             </div>
         </main>
     );

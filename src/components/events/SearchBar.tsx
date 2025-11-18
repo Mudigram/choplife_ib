@@ -1,7 +1,13 @@
 import React from 'react'
 import { Search } from "lucide-react";
 
-export default function SearchBar() {
+
+interface SearchBarProps {
+    value: string;
+    onChange: (v: string) => void;
+}
+
+export default function SearchBar({ value, onChange }: SearchBarProps) {
     return (
         <div>
             <div className="mt-4">
@@ -9,6 +15,8 @@ export default function SearchBar() {
                     <Search className="h-4 w-4 text-zinc-400" />
                     <input
                         placeholder="Search for Events"
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
                         className="flex-1 bg-transparent outline-none text-chop-text-light placeholder-zinc-400"
                         style={{ fontSize: "16px" }}
                     />

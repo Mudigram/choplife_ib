@@ -2,16 +2,23 @@
 
 import React from "react";
 import EventListSection from "./EventListSection";
-import { SampleEvents } from "@/data/sampleEvents";
 
-export default function EventList() {
+interface Props {
+    events: any[];
+}
+
+export default function EventList({ events }: Props) {
+    if (!events || events.length === 0) {
+        return (
+            <div className="text-center text-chop-text-subtle p-6">
+                <p>No events match your filters.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-10">
-
-            <EventListSection
-                title="🔥 Trending"
-                events={SampleEvents.trending}
-            />
+            <EventListSection title="Events" events={events} />
         </div>
     );
 }
