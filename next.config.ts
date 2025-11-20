@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       "tyivppecifemhowhtyxb.supabase.co",
       "ui-avatars.com",
       "images.pexels.com",
+      "images.unsplash.com",
     ],
   },
 };

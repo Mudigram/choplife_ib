@@ -9,7 +9,6 @@ import FeaturedListSection from "@/components/events/FeaturedListSection";
 import { useEvents } from "@/hooks/useEvents";
 import { useEventSection } from "@/hooks/useEventSections";
 import Spinner from "@/components/ui/Spinner";
-import EventListSection from "@/components/events/EventListSection";
 // types: Event shapes are flexible (from useEvents hook)
 
 export default function EventsPage() {
@@ -46,24 +45,42 @@ export default function EventsPage() {
     /** 🔥 Filter featured section events by category */
     const filteredTrending = React.useMemo(() => {
         if (!trending.data?.events) return [];
-        return category === "all"
-            ? trending.data.events
-            : trending.data.events.filter(event => event.category === category);
-    }, [trending.data, category]);
+        return trending.data.events.filter(event => {
+            const matchesCategory = category === "all" ? true : event.category === category;
+            const matchesSearch =
+                search.trim() === "" ||
+                event.title.toLowerCase().includes(search.toLowerCase());
+
+            return matchesCategory && matchesSearch;
+        });
+    }, [trending.data, category, search]);
+
 
     const filteredHotWeek = React.useMemo(() => {
         if (!hotWeek.data?.events) return [];
-        return category === "all"
-            ? hotWeek.data.events
-            : hotWeek.data.events.filter(event => event.category === category);
-    }, [hotWeek.data, category]);
+        return hotWeek.data.events.filter(event => {
+            const matchesCategory = category === "all" ? true : event.category === category;
+            const matchesSearch =
+                search.trim() === "" ||
+                event.title.toLowerCase().includes(search.toLowerCase());
+
+            return matchesCategory && matchesSearch;
+        });
+    }, [hotWeek.data, category, search]);
+
 
     const filteredFavorites = React.useMemo(() => {
         if (!favorites.data?.events) return [];
-        return category === "all"
-            ? favorites.data.events
-            : favorites.data.events.filter(event => event.category === category);
-    }, [favorites.data, category]);
+        return favorites.data.events.filter(event => {
+            const matchesCategory = category === "all" ? true : event.category === category;
+            const matchesSearch =
+                search.trim() === "" ||
+                event.title.toLowerCase().includes(search.toLowerCase());
+
+            return matchesCategory && matchesSearch;
+        });
+    }, [favorites.data, category, search]);
+
 
     /** 🔥 Loading & Error */
     if (loading) {

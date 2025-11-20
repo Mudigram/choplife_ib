@@ -1,48 +1,43 @@
-import React from "react";
+"use client";
+
+import React, { use } from "react";
 import Link from "next/link";
 import { ArrowLeftCircle } from "lucide-react";
 import EventCardSmall from "@/components/events/FeaturedEvents";
 import EventsSkeleton from "@/components/events/EventsSkeleton";
-import { SampleEvents } from "@/data/sampleEvents";
+import { useEventSection } from "@/hooks/useEventSections";
 
-const SECTIONS = {
-
+const SECTION_META = {
     "trending-around-you": {
         title: "Trending Around You",
         text: "Top events happening nearby",
-        data: SampleEvents.aroundYou,
     },
     "hot-this-week": {
         title: "Hot This Week",
         text: "Most anticipated events this week",
-        data: SampleEvents.hot,
     },
     "top-favorites": {
         title: "Top Favorites",
         text: "Events people love the most",
-        data: SampleEvents.favorites,
     },
     "trending": {
         title: "Trending",
         text: "Currently blowing up everywhere",
-        data: SampleEvents.trending,
-    }
-};
+    },
+} as const;
 
-export default async function Page({
-    params,
-}: {
-    params: Promise<{ slug: string }>;
-}) {
-    const { slug } = await params; // <-- unwrap
+export default function Page({ params }: { params: { slug: string } }) {
+    const { slug } = use(params);
+    console.log("SLUG:", slug);
+    const meta = SECTION_META[slug];
+    const { data, loading, error } = useEventSection(slug);
 
-    const section = SECTIONS[slug];
+    if (!meta) return <div>Invalid section</div>;
 
-    if (!section) {
-        return <div>Invalid section</div>;
-    }
+    // 🔥 Fetch Supabase section data using your hook
 
-    const events = [1];
+
+    const events = data?.events || [];
 
     return (
         <div className="min-h-screen w-full bg-black text-white px-4 pb-2 ">
@@ -57,24 +52,32 @@ export default async function Page({
                 "
             >
                 <h1 className="text-xl font-bold text-chop-text-light">
-                    {section.title}
+                    {meta.title}
                 </h1>
 
                 <p className="text-sm text-chop-text-subtle">
-                    {section.text}
+                    {meta.text}
                 </p>
             </div>
 
-            {events.length === 0 && <EventsSkeleton />}
+            {/* LOADING STATE */}
+            {loading && <EventsSkeleton />}
+
+            {/* ERROR STATE */}
+            {error && (
+                <p className="text-red-400 text-sm mt-4">
+                    Failed to load events: {error}
+                </p>
+            )}
 
             {/* CONTENT */}
             <div className="mt-4 space-y-3">
-                {section.data.map((event: any) => (
+                {events.map((event: any) => (
                     <EventCardSmall key={event.id} event={event} />
                 ))}
             </div>
 
-            {/* 🔙 FLOATING BACK BUTTON (bottom-left) */}
+            {/* 🔙 BACK BUTTON */}
             <Link
                 href="/events"
                 className="
@@ -96,5 +99,3 @@ export default async function Page({
         </div>
     );
 }
-
-

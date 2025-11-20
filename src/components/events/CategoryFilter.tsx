@@ -1,8 +1,6 @@
 "use client";
 
 import { EVENT_CATEGORIES } from "@/data/eventCategories";
-import { useEventsByCategory } from "@/hooks/useEventsByCategory";
-import { EventCategory } from "@/types/events";
 
 interface Props {
     selected: string;
