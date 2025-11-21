@@ -31,8 +31,8 @@ export default function Navbar() {
         <div className="fixed bottom-4 left-0 right-0 z-50 px-2 flex justify-center">
             <div
                 className=" 
-       bg-chop-bg-card/90 text-chop-text-light flex justify-around items-center h-18 w-full 
-                backdrop-blur-xl backdrop-saturate-200 rounded-full border border-chop-text-subtle/30 
+       bg-chop-bg-card/10 text-chop-text-light flex justify-around items-center h-18 w-full 
+                backdrop-blur-sm backdrop-saturate-200 rounded-full border border-chop-text-subtle/30 
                 md:w-[500px] md:rounded-3xl 
                 shadow-[0_0_20px_rgba(245,158,11,0.15)] transition-all duration-300
       "

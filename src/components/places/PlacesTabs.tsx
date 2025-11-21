@@ -4,6 +4,7 @@ import { useState } from "react";
 import GallerySection from "./tabs/GallerySection/GallerySection";
 import AboutTab from "./tabs/About";
 import ReviewsTab from "./tabs/Review";
+import MenuTab from "./tabs/MenuTab";
 
 import type { Place } from "@/types/place";
 import { useGallery } from "@/hooks/useGallery";
@@ -65,7 +66,7 @@ export default function PlaceTabs({
 
             {/* CONTENT AREA */}
             <div className="mt-6">
-                {active === 0 && <MenuSection />}
+                {active === 0 && <MenuTab placeId={placeId} />}
                 {active === 1 && <ReviewsTab placeId={placeId} />}
                 {active === 2 && <AboutTab place={place} />}
                 {active === 3 &&
@@ -79,15 +80,3 @@ export default function PlaceTabs({
     );
 }
 
-/* Placeholder sections */
-function MenuSection() {
-    return <div className="text-white">🍽️ Menu goes here…</div>;
-}
-
-function ReviewsSection() {
-    return <div className="text-white">⭐ Reviews go here…</div>;
-}
-
-function AboutSection() {
-    return <div className="text-white">📌 About goes here…</div>;
-}

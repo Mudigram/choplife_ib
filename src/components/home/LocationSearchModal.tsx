@@ -35,8 +35,14 @@ export default function LocationSearchModal({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-            <div className="bg-chop-bg-card p-4 w-[90%] rounded-xl shadow-lg">
+        <div
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+            onClick={onClose}
+        >
+            <div
+                className="bg-chop-bg-card p-4 w-[90%] rounded-xl shadow-lg"
+                onClick={(e) => e.stopPropagation()}
+            >
 
                 <input
                     className="w-full p-2 border rounded-xl text-chop-text-subtle"

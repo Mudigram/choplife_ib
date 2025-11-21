@@ -8,7 +8,6 @@ import {
     Star,
     Image as ImageIcon,
     BadgeCheck,
-    ThumbsUp,
     Loader2,
 } from "lucide-react";
 import Image from "next/image";
@@ -204,7 +203,7 @@ function RatingSummary({
                 <div className="flex items-center gap-3">
                     <Star className="text-[var(--color-chop-accent-point)]" />
                     <div>
-                        <div className="text-xl font-semibold">{avg}</div>
+                        <div className="text-xl text-gray-300 font-semibold">{avg}</div>
                         <div className="text-xs text-gray-300">{total} reviews</div>
                     </div>
                 </div>
@@ -246,7 +245,7 @@ function FilterBar({
     ];
 
     return (
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex sticky z-10 top-8 gap-2 overflow-x-auto scrollbar-none pb-1">
             {options.map((o) => (
                 <button
                     key={o.key}
