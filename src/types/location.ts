@@ -8,5 +8,5 @@ export interface LocationSuggestion {
 export interface LocationSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLocationSelect: (name: string, lat?: number, lng?: number) => void;
+  onLocationSelect: (name: string, lat: number, lng: number) => void;
 }

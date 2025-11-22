@@ -11,7 +11,7 @@ import {
 import { motion } from "framer-motion";
 
 type Props = {
-    place: Partial<Place>;
+    place?: Partial<Place> | null;
 };
 
 export default function AboutTab({ place }: Props) {
@@ -42,71 +42,74 @@ export default function AboutTab({ place }: Props) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 }} className="text-2xl font-bold tracking-tight text-white">
-                About {place.name}
+                About {place?.name || 'Place'}
             </motion.h1>
 
             {/* SHORT DESCRIPTION */}
-            {place.description && (
+            {place?.description && (
                 <p className="text-gray-300 leading-relaxed">
                     {place.description}
                 </p>
             )}
 
             {/* OPENING HOURS */}
-            {place.opening_hours && (
+            {place?.opening_hours && (
                 <SectionCard
                     title="Opening Hours"
                     icon={<Clock4Icon />}
                 >
                     {typeof place.opening_hours === "string" ? (
                         <p className="text-gray-300">{place.opening_hours}</p>
-                    ) : (
+                    ) : typeof place.opening_hours === 'object' ? (
                         <ul className="text-gray-300 space-y-1">
                             {Object.entries(place.opening_hours).map(([day, hours]) => (
                                 <li key={day}>
-                                    <span className="font-medium">{day}:</span> {hours}
+                                    <span className="font-medium">{day}:</span> {String(hours)}
                                 </li>
                             ))}
                         </ul>
-                    )}
+                    ) : null}
                 </SectionCard>
             )}
 
             {/* CONTACT */}
             <SectionCard
                 title="Contact"
-                icon={<BookOpen size={18} className="text-[var(--color-chop-accent-point)]" />}
+                icon={<BookOpen size={18} className="text-(--color-chop-accent-point)" />}
             >
                 <div className="space-y-2 text-gray-300">
-                    {place.contact_info?.phone && (
+                    {place?.contact_info && typeof place.contact_info === 'object' && 'phone' in place.contact_info && place.contact_info.phone && (
                         <p>
                             <span className="font-medium text-white">Phone:</span>{" "}
-                            {place.contact_info.phone}
+                            {String(place.contact_info.phone)}
                         </p>
                     )}
 
-                    {place.contact_info?.website && (
+                    {place?.contact_info && typeof place.contact_info === 'object' && 'website' in place.contact_info && place.contact_info.website && (
                         <p>
                             <span className="font-medium text-white">Website:</span>{" "}
                             <a
-                                href={place.contact_info.website}
+                                href={String(place.contact_info.website)}
                                 target="_blank"
-                                className="text-[var(--color-chop-accent-point)] underline"
+                                rel="noopener noreferrer"
+                                className="text-(--color-chop-accent-point) underline"
                             >
-                                {place.contact_info.website}
+                                {String(place.contact_info.website)}
                             </a>
                         </p>
                     )}
 
-                    <p>
-                        <span className="font-medium text-white">Reservations:</span>{" "}
-                        {place.accepts_reservations ? "Yes" : "No"}
-                    </p>
+                    {place?.accepts_reservations !== undefined && (
+                        <p>
+                            <span className="font-medium text-white">Reservations:</span>{" "}
+                            {place.accepts_reservations ? "Yes" : "No"}
+                        </p>
+                    )}
 
-                    {place.picture_policy && (
+                    {place?.picture_policy && (
                         <p>
                             <span className="font-medium text-white">Picture Policy:</span>{" "}
-                            {place.picture_policy}
+                            {String(place.picture_policy)}
                         </p>
                     )}
                 </div>
@@ -151,29 +154,31 @@ export default function AboutTab({ place }: Props) {
             )}
 
             {/* CHEF / FOUNDER */}
-            {place.chef_founder?.name && (
+            {place?.chef_founder && typeof place.chef_founder === 'object' && place.chef_founder.name && (
                 <SectionCard
                     title="Chef / Founder"
-                    icon={<UserRound size={18} className="text-[var(--color-chop-accent-point)]" />}
+                    icon={<UserRound size={18} className="text-(--color-chop-accent-point)" />}
                 >
                     <div className="flex items-start gap-4">
-                        <div className="w-50 h-14 rounded-full overflow-hidden border border-white/10">
+                        <div className="w-14 h-14 rounded-full overflow-hidden border border-white/10 shrink-0">
                             <Image
-                                src={place.chef_founder.image_url || defaultAvatar}
-                                alt={place.chef_founder.name}
-                                width={40}
-                                height={40}
+                                src={typeof place.chef_founder.image_url === 'string' ? place.chef_founder.image_url : defaultAvatar}
+                                alt={String(place.chef_founder.name)}
+                                width={56}
+                                height={56}
                                 className="w-full h-full object-cover"
                             />
                         </div>
 
                         <div>
                             <p className="font-semibold text-white">
-                                {place.chef_founder.name} — {place.chef_founder.role}
+                                {String(place.chef_founder.name)}{place.chef_founder.role ? ` — ${place.chef_founder.role}` : ''}
                             </p>
-                            <p className="text-gray-300 whitespace-pre-line leading-relaxed">
-                                {place.chef_founder.bio}
-                            </p>
+                            {place.chef_founder.bio && (
+                                <p className="text-gray-300 whitespace-pre-line leading-relaxed">
+                                    {String(place.chef_founder.bio)}
+                                </p>
+                            )}
                         </div>
                     </div>
                 </SectionCard>

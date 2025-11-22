@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Home, Search, User, Star, Bookmark, LogIn } from "lucide-react";
+import { Home, Compass, User, Star, Search, LogIn } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -18,8 +18,8 @@ export default function Navbar() {
 
     const navItems = [
         { name: "Home", icon: Home, href: "/home", protected: false },
-        { name: "Feed", icon: Search, href: "/feed", protected: false },
-        { name: "Events", icon: Bookmark, href: "/events", protected: true },
+        { name: "Search", icon: Search, href: "/feed", protected: false },
+        { name: "Explore", icon: Compass, href: "/events", protected: true },
         { name: "Favorites", icon: Star, href: "/favorites", protected: true },
         { name: "Profile", icon: User, href: "/profile", protected: true },
     ];

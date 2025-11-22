@@ -17,7 +17,7 @@ export default function HomePage() {
     const { profile, loading } = useProfile(user?.id);
     const router = useRouter();
 
-    const [locationName, setLocationName] = useState("Bodija, Oyo");
+    const [locationName, setLocationName] = useState("Click for Location");
     const [coords, setCoords] = useState<{ lat?: number; lng?: number }>({});
 
     useEffect(() => {
