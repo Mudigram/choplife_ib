@@ -4,13 +4,31 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   images: {
-    domains: [
-      "api.dicebear.com",
-      "placehold.co",
-      "tyivppecifemhowhtyxb.supabase.co",
-      "ui-avatars.com",
-      "images.pexels.com",
-      "images.unsplash.com",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tyivppecifemhowhtyxb.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
   },
 };

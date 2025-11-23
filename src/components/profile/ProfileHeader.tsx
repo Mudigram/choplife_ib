@@ -6,9 +6,10 @@ import type { UserProfile } from "@/types/user";
 
 type ProfileHeaderProps = {
     user: Partial<UserProfile>;
+    onEditClick?: () => void;
 };
 
-export default function ProfileHeader({ user }: ProfileHeaderProps) {
+export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps) {
     const defaultAvatar =
         "https://ui-avatars.com/api/?name=" +
         encodeURIComponent(user?.full_name || "User") +
@@ -29,6 +30,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 
                 {/* Edit Icon */}
                 <button
+                    onClick={onEditClick}
                     className="absolute bottom-0 right-0 bg-chop-bg-dark text-chop-text-light rounded-full p-1.5 shadow-md hover:bg-chop-bg-dark/80 transition border border-chop-text-light/10"
                     title="Edit Profile"
                 >

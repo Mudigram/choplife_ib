@@ -29,7 +29,7 @@ export enum EventTab {
 export interface EventCardData {
   id: string;
   title: string;
-  image_url: string;
+  thumbnail: string;
   // category comes from the DB as a string; prefer a union to allow both raw strings and enum values
   category: string | EventCategory;
   location: string;
@@ -52,7 +52,7 @@ export interface IbadanEvent {
   created_at: string;
   title: string;
   description: string | null;
-  image_url: string;
+  thumbnail: string;
   venue: string;
   location: string;
   city: string;
@@ -63,6 +63,8 @@ export interface IbadanEvent {
   organizer_id: string | null;
   is_verified: boolean;
   ticket_link: string | null;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 // -------------------------

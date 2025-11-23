@@ -12,9 +12,10 @@ import { updateUserLocation } from "@/lib/supabase/updateUserLocation";
 type HomeHeaderProps = {
     user: UserProfile;
     location: string;
+    onLocationChange?: (location: string, lat?: number, lon?: number) => void;
 };
 
-export default function HomeHeader({ user, location }: HomeHeaderProps) {
+export default function HomeHeader({ user, location, onLocationChange }: HomeHeaderProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentLocation, setCurrentLocation] = useState(location);
     const [hasNotifications, setHasNotifications] = useState(true);
@@ -34,6 +35,12 @@ export default function HomeHeader({ user, location }: HomeHeaderProps) {
             setLocationError(null);
             setCurrentLocation(locationName);
             await updateUserLocation(locationName, lat, lon);
+
+            // Notify parent
+            if (onLocationChange) {
+                onLocationChange(locationName, lat, lon);
+            }
+
             setIsModalOpen(false);
         } catch (error) {
             console.error("Failed to update location:", error);

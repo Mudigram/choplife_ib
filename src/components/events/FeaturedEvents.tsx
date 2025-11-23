@@ -8,7 +8,7 @@ interface EventProps {
     event: {
         id: number;
         title: string;
-        image_url: string;
+        thumbnail: string;
         start_date_time: string;
         venue?: string;
     };
@@ -38,7 +38,7 @@ export default function EventCardSmall({ event }: EventProps) {
                 {/* Thumbnail - small like Spotify */}
                 <div className="relative w-12 h-12 min-w-[3rem]">
                     <Image
-                        src={event.image_url}
+                        src={event.thumbnail || "/assets/default-avatar.png"}
                         alt={event.title}
                         fill
                         className="rounded-lg object-cover"

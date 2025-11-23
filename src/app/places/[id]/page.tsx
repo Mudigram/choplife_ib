@@ -14,7 +14,7 @@ export default function PlacePage() {
 
     if (loading) return <div className="p-6">Loading…</div>;
     if (error) return <div className="p-6 text-red-500">{error}</div>;
-    if (!place) return <div className="p-6">Place not found</div>;
+    if (!place || !placeId) return <div className="p-6">Place not found</div>;
 
     return (
         <div className="">
@@ -23,8 +23,6 @@ export default function PlacePage() {
                 <InfoSection place={place} />
             </div>
             <PlaceTabs place={place} placeId={placeId} />
-
-
         </div>
     );
 }

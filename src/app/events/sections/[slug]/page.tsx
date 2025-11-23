@@ -26,10 +26,10 @@ const SECTION_META = {
     },
 } as const;
 
-export default function Page({ params }: { params: { slug: string } }) {
+export default function Page({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = use(params);
     console.log("SLUG:", slug);
-    const meta = SECTION_META[slug];
+    const meta = SECTION_META[slug as keyof typeof SECTION_META];
     const { data, loading, error } = useEventSection(slug);
 
     if (!meta) return <div>Invalid section</div>;

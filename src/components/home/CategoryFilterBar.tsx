@@ -1,34 +1,46 @@
 "use client";
 
-import { useState } from 'react';
+import {
+    Heart,
+    Wallet,
+    Laptop,
+    Moon,
+    Music,
+    TreePine,
+    Coffee,
+    Utensils,
+    LayoutGrid
+} from "lucide-react";
+
 
 // Define a simple type for the filter tags
 type Category = {
     id: string;
     label: string;
+    icon: React.ReactNode;
 };
 
 type CategoryFilterBarProps = {
-    // A function to call when a user clicks a tag, allowing the parent (HomePage) to filter the feed.
+    selected: string | null;
     onFilterSelect: (categoryId: string) => void;
 };
 
-// ⚠️ MOCK DATA: In a real app, this would be fetched from Supabase ('categories' table)
+// Curated Collections
 const MOCK_CATEGORIES: Category[] = [
-    { id: 'all', label: 'All Chops' },
-    { id: 'nigerian', label: 'Nigerian 🇳🇬' },
-    { id: 'ghanaian', label: 'Ghanaian 🇬🇭' },
-    { id: 'quick', label: 'Quick Chop ⚡' },
-    { id: 'budget', label: 'Budget Bites 💰' },
-    { id: 'verified', label: 'Verified Chefs ✅' },
-    { id: 'drinks', label: 'Drinks & Cocktails 🍹' },
+    { id: "all", label: "All", icon: <LayoutGrid size={16} /> },
+    { id: "date_night", label: "Date Night", icon: <Heart size={16} /> },
+    { id: "budget", label: "Budget Eats", icon: <Wallet size={16} /> },
+    { id: "work_friendly", label: "Work Friendly", icon: <Laptop size={16} /> },
+    { id: "late_night", label: "Late Night", icon: <Moon size={16} /> },
+    { id: "live_music", label: "Live Music", icon: <Music size={16} /> },
+    { id: "outdoor", label: "Outdoor", icon: <TreePine size={16} /> },
+    { id: "cafes", label: "Cozy Cafes", icon: <Coffee size={16} /> },
+    { id: "fine_dining", label: "Fine Dining", icon: <Utensils size={16} /> },
 ];
 
-export default function CategoryFilterBar({ onFilterSelect }: CategoryFilterBarProps) {
-    const [activeFilter, setActiveFilter] = useState('all');
 
+export default function CategoryFilterBar({ selected, onFilterSelect }: CategoryFilterBarProps) {
     const handleFilterClick = (id: string) => {
-        setActiveFilter(id);
         onFilterSelect(id);
     };
 
@@ -45,16 +57,18 @@ export default function CategoryFilterBar({ onFilterSelect }: CategoryFilterBarP
                         className={`
                         flex-shrink-0 
                         py-1.5 px-3 
-                        text-sm font-medium 
+                        text-sm font-medium
+                        flex items-center gap-2 
                         rounded-full 
                         transition-colors duration-200
-                        ${activeFilter === category.id
+                        ${(selected === category.id || (category.id === 'all' && !selected))
                                 ? 'bg-chop-accent-cta text-white shadow-md backdrop-blur-xl' // Active style
                                 : 'backdrop-blur-2xl bg-white/10 border border-white/20 text-gray-100 hover:bg-white/20 shadow-lg' // Inactive glassy style
                             }
                     `}
                     >
                         {category.label}
+                        {category.icon}
                     </button>
                 ))}
 

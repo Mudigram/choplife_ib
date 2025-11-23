@@ -6,9 +6,11 @@ import {
     ScrollText,
     HeartHandshake,
     Sparkles,
-    UserRound
+    UserRound,
+    MapPin
 } from "lucide-react";
 import { motion } from "framer-motion";
+import SingleLocationMap from "@/components/map/SingleLocationMap";
 
 type Props = {
     place?: Partial<Place> | null;
@@ -20,7 +22,7 @@ export default function AboutTab({ place }: Props) {
         encodeURIComponent(place?.name || "User") +
         "&background=random";
 
-    const highlights = place.special_highlights ?? [];
+    const highlights = place?.special_highlights ?? [];
 
     return (
         <motion.div
@@ -115,8 +117,22 @@ export default function AboutTab({ place }: Props) {
                 </div>
             </SectionCard>
 
+            {/* LOCATION MAP */}
+            {place?.latitude && place?.longitude && (
+                <SectionCard
+                    title="Location"
+                    icon={<MapPin size={18} className="text-[var(--color-chop-accent-point)]" />}
+                >
+                    <SingleLocationMap
+                        lat={place.latitude}
+                        lng={place.longitude}
+                        title={place.name || "Place"}
+                    />
+                </SectionCard>
+            )}
+
             {/* ORIGIN STORY */}
-            {place.origin_story && (
+            {place?.origin_story && (
                 <SectionCard
                     title="Origin Story"
                     icon={<ScrollText size={18} className="text-[var(--color-chop-accent-point)]" />}
@@ -128,7 +144,7 @@ export default function AboutTab({ place }: Props) {
             )}
 
             {/* MISSION */}
-            {place.mission && (
+            {place?.mission && (
                 <SectionCard
                     title="Mission"
                     icon={<HeartHandshake size={18} className="text-[var(--color-chop-accent-point)]" />}

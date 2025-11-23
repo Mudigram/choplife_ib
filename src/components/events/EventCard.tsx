@@ -27,7 +27,7 @@ const CATEGORY_COLORS: Record<Category, string> = {
 
 export default function EventCard({ event }: EventCardProps) {
     /** Map Supabase field names to display values */
-    const imageUrl = (event.image_url as string) || (event.image as string) || "/assets/placeholder.png";
+    const imageUrl = (event.thumbnail as string) || "/assets/events/food2.jpg";
     const title = (event.title as string) || "Untitled Event";
 
     // Parse start_date_time from Supabase (ISO format)

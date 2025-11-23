@@ -31,6 +31,7 @@ export type Place = {
   is_featured?: boolean | null;
   average_rating?: number | null;
   total_reviews?: number | null;
+  area?: string | null;
 
   created_at?: string | null;
   updated_at?: string | null;
@@ -38,6 +39,7 @@ export type Place = {
   open_time?: string | null;
   pricing_category?: string | null;
   cuisine_type?: string | null;
+  price_range?: string | null;
 
   // --- New Fields ---
   accepts_reservations?: boolean | null;

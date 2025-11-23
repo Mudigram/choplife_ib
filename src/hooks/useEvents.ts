@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
-import { EventCardData } from "@/types/events";
+import { IbadanEvent } from "@/types/events";
 
 export function useEvents() {
-  const [events, setEvents] = useState<EventCardData[]>([]);
+  const [events, setEvents] = useState<IbadanEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

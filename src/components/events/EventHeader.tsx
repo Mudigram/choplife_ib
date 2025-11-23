@@ -2,30 +2,30 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import type { Place } from '@/types/place';
-import { CircleArrowLeft, Share, Heart, BadgeCheck, Check } from "lucide-react";
+import type { IbadanEvent } from '@/types/events';
+import { CircleArrowLeft, Share, Heart, Check } from "lucide-react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useFavorites } from "@/hooks/useFavorites";
 
-type PlaceHeaderProps = {
-    place: Partial<Place>;
+type EventHeaderProps = {
+    event: Partial<IbadanEvent>;
 };
 
-export default function Header({ place }: PlaceHeaderProps) {
+export default function EventHeader({ event }: EventHeaderProps) {
     const user = useSelector((state: RootState) => state.auth.user);
     const { isFavorite, toggleFavorite } = useFavorites(user?.id);
     const [showCopied, setShowCopied] = useState(false);
 
     const defaultHeader = "/assets/header/header1.jpg";
-    const imageUrl = place?.image_url || defaultHeader;
-    const name = place?.name || "Place";
-    const placeId = place?.id;
+    const imageUrl = event?.thumbnail || defaultHeader;
+    const title = event?.title || "Event";
+    const eventId = event?.id;
 
     const handleFavorite = () => {
-        if (placeId) {
-            toggleFavorite({ id: placeId, type: "place" });
+        if (eventId) {
+            toggleFavorite({ id: eventId, type: "event" });
         }
     };
 
@@ -36,8 +36,8 @@ export default function Header({ place }: PlaceHeaderProps) {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: name,
-                    text: `Check out ${name} on ChopLife!`,
+                    title: title,
+                    text: `Check out ${title} on ChopLife!`,
                     url: url,
                 });
                 return;
@@ -56,7 +56,25 @@ export default function Header({ place }: PlaceHeaderProps) {
         }
     };
 
-    const isFav = placeId ? isFavorite(placeId) : false;
+    const isFav = eventId ? isFavorite(eventId) : false;
+
+    // Format date
+    const eventDate = event?.start_date_time
+        ? new Date(event.start_date_time).toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        })
+        : null;
+
+    const eventTime = event?.start_date_time
+        ? new Date(event.start_date_time).toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        })
+        : null;
 
     return (
         <header className="relative w-full max-w-lg mx-auto">
@@ -65,9 +83,9 @@ export default function Header({ place }: PlaceHeaderProps) {
             <div className="relative w-full h-72">
                 <Image
                     src={imageUrl}
-                    alt={name}
+                    alt={title}
                     fill
-                    className="object-cover "
+                    className="object-cover"
                     priority
                 />
 
@@ -113,30 +131,30 @@ export default function Header({ place }: PlaceHeaderProps) {
                 </div>
             </div>
 
-            {/* PLACE INFO SECTION */}
+            {/* EVENT INFO SECTION */}
             <div className="px-4 py-4 max-w-lg mx-auto bg-linear-to-b from-black/50 to-transparent relative -mt-20 z-10">
-                <h1 className="text-2xl font-bold text-white mb-2">{name}</h1>
+                <h1 className="text-2xl font-bold text-white mb-2">{title}</h1>
 
-                {/* RATING */}
-                {place?.average_rating ? (
+                {/* DATE & TIME */}
+                {eventDate && (
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="text-yellow-400 font-semibold">{place.average_rating.toFixed(1)} ★</span>
-                        <span className="text-gray-300 text-sm">({place.total_reviews || 0} reviews)</span>
-                    </div>
-                ) : null}
-
-                {/* CATEGORY */}
-                {place?.category && (
-                    <div className="inline-block bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm text-white/80 mb-3">
-                        {place.category}
+                        <span className="text-yellow-400 font-semibold">📅 {eventDate}</span>
+                        {eventTime && <span className="text-gray-300 text-sm">• {eventTime}</span>}
                     </div>
                 )}
 
-                {/* ADDRESS */}
-                {place?.address && (
+                {/* CATEGORY */}
+                {event?.category && (
+                    <div className="inline-block bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm text-white/80 mb-3">
+                        {event.category}
+                    </div>
+                )}
+
+                {/* VENUE */}
+                {event?.venue && (
                     <p className="text-gray-300 text-sm flex items-start gap-2">
                         <span>📍</span>
-                        <span>{place.address}</span>
+                        <span>{event.venue}</span>
                     </p>
                 )}
             </div>

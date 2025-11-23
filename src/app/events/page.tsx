@@ -1,15 +1,19 @@
 "use client";
 
-import React from "react";
-import EventTabs from "@/components/events/EventsTab";
-import EventCategoryBar from "@/components/events/CategoryFilter";
-import SearchBar from "@/components/events/SearchBar";
-import EventList from "@/components/events/EventsList";
-import FeaturedListSection from "@/components/events/FeaturedListSection";
+import React, { useMemo, useState } from "react";
 import { useEvents } from "@/hooks/useEvents";
-import { useEventSection } from "@/hooks/useEventSections";
+import MasonryGrid from "@/components/browse/MasonryGrid";
+import BrowseCard from "@/components/browse/BrowseCard";
 import Spinner from "@/components/ui/Spinner";
-// types: Event shapes are flexible (from useEvents hook)
+import { Search, SlidersHorizontal, Calendar as CalendarIcon } from "lucide-react";
+
+// Filter Options
+const CATEGORIES = ["all", "Party", "Concert", "Workshop", "Meetup", "Comedy"];
+const SORT_OPTIONS = [
+    { label: "Date (Soonest)", value: "date_asc" },
+    { label: "Date (Latest)", value: "date_desc" },
+    { label: "Popularity", value: "popular" },
+];
 
 export default function EventsPage() {
     /** 🔥 Fetch all events */
@@ -20,158 +24,161 @@ export default function EventsPage() {
     } = useEvents();
 
     /** 🔥 UI State */
-    const [category, setCategory] = React.useState<string>("all");
-    const [search, setSearch] = React.useState<string>("");
+    const [category, setCategory] = useState<string>("all");
+    const [search, setSearch] = useState<string>("");
+    const [sortBy, setSortBy] = useState<string>("date_asc");
 
-    /** 🔥 Filtered Events */
-    const filteredEvents = React.useMemo(() => {
-        return allEvents.filter(event => {
+    /** 🔥 Filtered & Sorted Events */
+    const filteredEvents = useMemo(() => {
+        let result = allEvents.filter(event => {
             const matchesCategory =
                 category === "all" ? true : event.category === category;
 
             const matchesSearch =
                 search.trim() === "" ||
-                event.title.toLowerCase().includes(search.toLowerCase());
+                event.title.toLowerCase().includes(search.toLowerCase()) ||
+                (event.venue && event.venue.toLowerCase().includes(search.toLowerCase()));
 
             return matchesCategory && matchesSearch;
         });
-    }, [allEvents, category, search]);
 
-    /** 🔥 Fetch Supabase featured sections */
-    const trending = useEventSection("trending-around-you");
-    const hotWeek = useEventSection("hot-this-week");
-    const favorites = useEventSection("top-favorites");
-
-    /** 🔥 Filter featured section events by category */
-    const filteredTrending = React.useMemo(() => {
-        if (!trending.data?.events) return [];
-        return trending.data.events.filter(event => {
-            const matchesCategory = category === "all" ? true : event.category === category;
-            const matchesSearch =
-                search.trim() === "" ||
-                event.title.toLowerCase().includes(search.toLowerCase());
-
-            return matchesCategory && matchesSearch;
+        // Sort
+        result.sort((a, b) => {
+            switch (sortBy) {
+                case "date_asc":
+                    return new Date(a.start_date_time).getTime() - new Date(b.start_date_time).getTime();
+                case "date_desc":
+                    return new Date(b.start_date_time).getTime() - new Date(a.start_date_time).getTime();
+                case "popular":
+                    // Assuming we might have a popularity metric later, for now fallback to date
+                    return 0;
+                default:
+                    return 0;
+            }
         });
-    }, [trending.data, category, search]);
 
-
-    const filteredHotWeek = React.useMemo(() => {
-        if (!hotWeek.data?.events) return [];
-        return hotWeek.data.events.filter(event => {
-            const matchesCategory = category === "all" ? true : event.category === category;
-            const matchesSearch =
-                search.trim() === "" ||
-                event.title.toLowerCase().includes(search.toLowerCase());
-
-            return matchesCategory && matchesSearch;
-        });
-    }, [hotWeek.data, category, search]);
-
-
-    const filteredFavorites = React.useMemo(() => {
-        if (!favorites.data?.events) return [];
-        return favorites.data.events.filter(event => {
-            const matchesCategory = category === "all" ? true : event.category === category;
-            const matchesSearch =
-                search.trim() === "" ||
-                event.title.toLowerCase().includes(search.toLowerCase());
-
-            return matchesCategory && matchesSearch;
-        });
-    }, [favorites.data, category, search]);
-
+        return result;
+    }, [allEvents, category, search, sortBy]);
 
     /** 🔥 Loading & Error */
     if (loading) {
         return (
-            <div className="w-full min-h-screen bg-chop-bg-dark text-center p-6">
-                <Spinner size="lg" message="Loading Events" full />
+            <div className="w-full min-h-screen bg-chop-bg-dark text-center p-6 flex items-center justify-center">
+                <Spinner size="lg" message="Loading Events..." full />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="text-center text-chop-accent-error p-6">
+            <div className="min-h-screen bg-chop-bg-dark flex items-center justify-center text-chop-accent-error p-6">
                 Error loading events: {error}
-            </div>
-        );
-    }
-
-    if (allEvents.length === 0) {
-        return (
-            <div className="text-center text-chop-text-subtle p-6">
-                <p>No events currently available yet.</p>
             </div>
         );
     }
 
     return (
         <main className="w-full min-h-screen bg-chop-bg-dark text-white pb-20">
-            <div className="max-w-lg mx-auto px-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
-                {/* PAGE TITLE */}
-                <header className="py-4">
-                    <h1 className="text-3xl font-extrabold">ChopLife Pulse</h1>
-                    <p className="text-gray-400 text-sm mt-1">
-                        Find what is happening near you.
+                {/* HEADER */}
+                <div className="mb-8 space-y-4">
+                    <h1 className="text-4xl font-extrabold tracking-tight">
+                        ChopLife Pulse
+                    </h1>
+                    <p className="text-gray-400 max-w-2xl">
+                        Find the hottest events, parties, and gatherings happening in Ibadan.
                     </p>
-                </header>
-
-                {/* SEARCH BAR */}
-                <div className="mt-2 mb-3">
-                    <SearchBar value={search} onChange={setSearch} />
                 </div>
 
-                {/* FILTER ZONE */}
-                <div className="sticky top-0 z-50 bg-chop-bg-dark/95 backdrop-blur-md pb-3 pt-2">
+                {/* CONTROLS BAR */}
+                <div className="sticky top-0 z-40 bg-chop-bg-dark/95 backdrop-blur-md py-4 mb-6 border-b border-white/10 space-y-4">
 
-                    <EventTabs />
+                    {/* Search & Sort Row */}
+                    <div className="flex flex-col md:flex-row gap-4 justify-between">
+                        {/* Search */}
+                        <div className="relative w-full md:w-96">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                placeholder="Search events..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[var(--color-chop-accent-point)] transition-colors"
+                            />
+                        </div>
 
-                    <div className="mt-2">
-                        <EventCategoryBar
-                            selected={category}
-                            onSelect={(cat) => setCategory(cat)}
-                        />
+                        {/* Sort */}
+                        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+                            <SlidersHorizontal size={16} className="text-gray-400 shrink-0" />
+                            {SORT_OPTIONS.map((option) => (
+                                <button
+                                    key={option.value}
+                                    onClick={() => setSortBy(option.value)}
+                                    className={`
+                                        px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all
+                                        ${sortBy === option.value
+                                            ? "bg-[var(--color-chop-accent-point)] text-black"
+                                            : "bg-white/5 text-gray-400 hover:bg-white/10"}
+                                    `}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Filters Row */}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        {/* Categories */}
+                        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                            <span className="text-xs text-gray-500 font-medium uppercase tracking-wider shrink-0">Category</span>
+                            {CATEGORIES.map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setCategory(cat)}
+                                    className={`
+                                        px-3 py-1 rounded-full text-xs whitespace-nowrap transition-all border
+                                        ${category === cat
+                                            ? "bg-white text-black border-white"
+                                            : "bg-transparent text-gray-400 border-white/10 hover:border-white/30"}
+                                    `}
+                                >
+                                    {cat === "all" ? "All" : cat}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* CONTENT */}
-                <section className="mt-4">
-
-                    {/* MAIN EVENT LIST (FILTERED) */}
-                    <EventList events={filteredEvents} />
-
-                    <FeaturedListSection
-                        title="Trending Around You"
-                        text="Best Rec and promoted events"
-                        slug="trending-around-you"
-                        loading={trending.loading}
-                        error={trending.error}
-                        events={filteredTrending}
-                    />
-
-                    <FeaturedListSection
-                        title="Hot this Week"
-                        text="Most active events this week"
-                        slug="hot-this-week"
-                        loading={hotWeek.loading}
-                        error={hotWeek.error}
-                        events={filteredHotWeek}
-                    />
-
-                    <FeaturedListSection
-                        title="Top Favorites"
-                        text="Most saved and trending"
-                        slug="top-favorites"
-                        loading={favorites.loading}
-                        error={favorites.error}
-                        events={filteredFavorites}
-                    />
-
-                    <EventList events={filteredEvents} />
-                </section>
+                {/* GRID CONTENT */}
+                {filteredEvents.length === 0 ? (
+                    <div className="text-center py-20 text-gray-400">
+                        <p className="text-lg">No events found</p>
+                        <p className="text-sm">Try adjusting your filters</p>
+                    </div>
+                ) : (
+                    <MasonryGrid>
+                        {filteredEvents.map((event) => (
+                            <BrowseCard
+                                key={event.id}
+                                id={event.id}
+                                type="event"
+                                title={event.title}
+                                subtitle={event.venue || undefined}
+                                imageUrl={event.thumbnail}
+                                category={event.category || undefined}
+                                date={new Date(event.start_date_time).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: '2-digit'
+                                })}
+                                price={event.price_ngn > 0 ? `₦${event.price_ngn.toLocaleString()}` : "Free"}
+                            />
+                        ))}
+                    </MasonryGrid>
+                )}
             </div>
         </main>
     );

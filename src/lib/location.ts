@@ -4,10 +4,31 @@ import type { LocationSuggestion } from "@/types/location";
 export async function reverseGeocode(lat: number, lon: number) {
   const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
 
-  const res = await fetch(url);
-  const data = await res.json();
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
 
-  return data.display_name || "Unknown Location";
+    if (data && data.address) {
+      // Prioritize specific area names that likely match "area" in DB
+      const area =
+        data.address.suburb ||
+        data.address.neighbourhood ||
+        data.address.residential ||
+        data.address.district ||
+        data.address.quarter ||
+        data.address.city ||
+        data.address.town ||
+        data.address.village ||
+        "Unknown Location";
+
+      return area;
+    }
+
+    return "Unknown Location";
+  } catch (error) {
+    console.error("Error reverse geocoding:", error);
+    return "Unknown Location";
+  }
 }
 
 export async function searchLocations(

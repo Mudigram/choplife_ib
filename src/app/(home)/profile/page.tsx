@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -12,6 +12,7 @@ export default function ProfilePage() {
     const user = useSelector((state: RootState) => state.auth.user);
     const { profile, loading } = useProfile(user?.id);
     const router = useRouter();
+    const [activeTab, setActiveTab] = useState("overview");
 
     // Redirect if no user
     useEffect(() => {
@@ -44,13 +45,19 @@ export default function ProfilePage() {
         tags: user.user_metadata?.tags || [],
     };
 
+
+
     return (
         <div className="min-h-screen w-full bg-chop-bg-dark">
-            <ProfileHeader user={profileData} />
+            <ProfileHeader
+                user={profileData}
+                onEditClick={() => setActiveTab("settings")}
+            />
             <div className="w-full max-w-md mx-auto px-4">
                 <ProfileTabs
                     user={profileData}
-                    onTabChange={(tab) => console.log("Active tab:", tab)}
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
                 />
             </div>
         </div>

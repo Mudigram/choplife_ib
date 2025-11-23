@@ -24,7 +24,7 @@ export default function FeaturedListSection({ slug, title, text, events }: Props
     return (
         <section className="mt-6">
             {/* SECTION HEADER */}
-            <Link href={`/events/${slug}`}>
+            <Link href={`/events/sections/${slug}`}>
                 <div className="flex items-center">
                     <h2 className="text-lg font-bold mr-6">{title}</h2>
                     <button className="text-chop-accent-point text-sm">

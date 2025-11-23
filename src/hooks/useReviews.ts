@@ -22,13 +22,15 @@ export type Review = {
 };
 
 type UseReviewsOpts = {
-  placeId: string | undefined;
+  placeId?: string;
+  userId?: string;
   pageSize?: number;
   initial?: Review[];
 };
 
 export default function useReviews({
   placeId,
+  userId,
   pageSize = 8,
   initial = [],
 }: UseReviewsOpts) {
@@ -39,13 +41,13 @@ export default function useReviews({
   const cursorRef = useRef<string | null>(null);
 
   const fetchPage = useCallback(async () => {
-    if (!placeId || loading || !hasMore) return;
+    if ((!placeId && !userId) || loading || !hasMore) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      const query = supabase
+      let query = supabase
         .from("reviews")
         .select(
           `
@@ -60,12 +62,18 @@ export default function useReviews({
           is_verified,
           likes_count,
           is_anonymous,
-          users:user_id (username, avatar_url)
+          users:user_id (username, avatar_url),
+          places:place_id (name, image_url)
         `
         )
-        .eq("place_id", placeId)
         .order("created_at", { ascending: false })
         .limit(pageSize);
+
+      if (placeId) {
+        query = query.eq("place_id", placeId);
+      } else if (userId) {
+        query = query.eq("user_id", userId);
+      }
 
       // Cursor pagination
       if (cursorRef.current) {
@@ -88,6 +96,8 @@ export default function useReviews({
       const mapped = data.map((r: any) => ({
         id: r.id,
         place_id: r.place_id,
+        place_name: r.places?.name,
+        place_image: r.places?.image_url,
         user_id: r.user_id,
         username: r.users?.username ?? null,
         avatar_url: r.users?.avatar_url ?? null,
@@ -110,15 +120,15 @@ export default function useReviews({
     } finally {
       setLoading(false);
     }
-  }, [placeId, pageSize, loading, hasMore]);
+  }, [placeId, userId, pageSize, loading, hasMore]);
 
-  // Reset on place change
+  // Reset on id change
   useEffect(() => {
     setReviews(initial ?? []);
     cursorRef.current = null;
     setHasMore(true);
     setError(null);
-  }, [placeId]);
+  }, [placeId, userId]);
 
   // Manual refresh
   const refresh = useCallback(async () => {

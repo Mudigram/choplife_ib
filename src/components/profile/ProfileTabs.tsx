@@ -1,31 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { Star, User, Settings } from "lucide-react";
+import { Star, User, Settings, Activity } from "lucide-react";
 import OverviewTab from "./tabs/OverviewTab";
 import FavoritesTab from "./tabs/FavoritesTab";
 import SettingsTab from "./tabs/SettingsTab";
+import ActivityTab from "./tabs/ActivityTab";
 import type { UserProfile } from "@/types/user";
 import { useUserData } from "@/hooks/useUserData";
 
 type ProfileTabsProps = {
     user: Partial<UserProfile> & { id: string };
-    onTabChange?: (tab: string) => void;
+    activeTab: string;
+    onTabChange: (tab: string) => void;
 };
 
-export default function ProfileTabs({ user, onTabChange }: ProfileTabsProps) {
-    const [activeTab, setActiveTab] = useState("overview");
+export default function ProfileTabs({ user, activeTab, onTabChange }: ProfileTabsProps) {
     const userData = useUserData(user.id);
 
     const tabs = [
         { id: "overview", label: "Overview", icon: User },
+        { id: "activity", label: "Activity", icon: Activity },
         { id: "favorites", label: "Favorites", icon: Star },
         { id: "settings", label: "Settings", icon: Settings },
     ];
 
     const handleTabClick = (id: string) => {
-        setActiveTab(id);
-        onTabChange?.(id);
+        onTabChange(id);
     };
 
     return (
@@ -53,6 +54,7 @@ export default function ProfileTabs({ user, onTabChange }: ProfileTabsProps) {
             {/* Active Tab Content */}
             <div className="mt-4">
                 {activeTab === "overview" && <OverviewTab user={userData || {}} />}
+                {activeTab === "activity" && <ActivityTab userId={user.id} />}
                 {activeTab === "favorites" && <FavoritesTab userId={user.id} />}
                 {activeTab === "settings" && <SettingsTab user={user} />}
             </div>
