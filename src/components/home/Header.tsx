@@ -131,22 +131,21 @@ export default function HomeHeader({ user, location, onLocationChange }: HomeHea
 
                     {/* Search Bar */}
                     <div className="mt-4">
-                        <div className="flex items-center gap-2 rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 px-4 py-2">
-                            <Search className="h-4 w-4 text-zinc-400" />
-                            <input
-                                placeholder="Explore your City"
-                                aria-label="Search"
-                                className="flex-1 bg-transparent outline-none text-chop-text-light placeholder-zinc-400"
-                                style={{ fontSize: "16px" }}
-                            />
-                            <Button
-                                variant="ghost"
-                                aria-label="Filters"
-                                className="p-1"
-                            >
-                                <SlidersHorizontal className="h-4 w-4 text-chop-accent-cta" />
-                            </Button>
-                        </div>
+                        <Link href="/search" className="block">
+                            <div className="flex items-center gap-2 rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 px-4 py-2 transition-colors hover:bg-white/15 cursor-text">
+                                <Search className="h-4 w-4 text-zinc-400" />
+                                <div className="flex-1 text-zinc-400 text-base">
+                                    Explore your City
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    aria-label="Filters"
+                                    className="p-1 hover:bg-white/10"
+                                >
+                                    <SlidersHorizontal className="h-4 w-4 text-chop-accent-cta" />
+                                </Button>
+                            </div>
+                        </Link>
                     </div>
                 </div>
 

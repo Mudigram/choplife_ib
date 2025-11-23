@@ -18,7 +18,7 @@ export default function Navbar() {
 
     const navItems = [
         { name: "Home", icon: Home, href: "/home", protected: false },
-        { name: "Search", icon: Search, href: "/feed", protected: false },
+        { name: "Search", icon: Search, href: "/search", protected: false },
         { name: "Explore", icon: Compass, href: "/events", protected: true },
         { name: "Favorites", icon: Star, href: "/favorites", protected: true },
         { name: "Profile", icon: User, href: "/profile", protected: true },
