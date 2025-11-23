@@ -47,7 +47,26 @@ export default function HomePage() {
         if (!user) router.push("/login");
     }, [user, router]);
 
-    // 1. String-based fetch (Legacy/Fallback)
+    // Initialize location from profile
+    useEffect(() => {
+        if (profile?.location) {
+            setLocationName(profile.location);
+            if (profile.latitude && profile.longitude) {
+                setCoords({ lat: profile.latitude, lng: profile.longitude });
+            }
+        } else if ("geolocation" in navigator && !coords.lat) {
+            // Only try geolocation if no profile location and no coords yet
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    handleLocationChange("Current Location", latitude, longitude);
+                },
+                (error) => {
+                    console.log("Location access denied or error:", error);
+                }
+            );
+        }
+    }, [profile]);
     const { itemscat } = usePlacesByCategoryArea({ category, area, limit: 12 });
 
     // 2. Geospatial fetch (Optimal)

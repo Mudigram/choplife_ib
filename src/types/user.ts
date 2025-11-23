@@ -10,4 +10,7 @@ export type UserProfile = {
   total_points?: number;
   social_handles?: Record<string, string>;
   created_at?: string;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
 };
