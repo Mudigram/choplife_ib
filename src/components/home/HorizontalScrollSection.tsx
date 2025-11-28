@@ -62,8 +62,8 @@ export default function HorizontalScrollSection({ title, items, onItemClick, onF
                                     alt={item.title || "image"}
                                     fill
                                     className="object-cover"
-                                    sizes="(max-width: 640px) 260px, 200px"
-                                    unoptimized={false} // keep false unless you need unoptimized
+                                    sizes="(max-width: 768px) 260px, (max-width: 1024px) 240px, 200px"
+                                    loading="lazy"
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800/60 to-zinc-900/60">

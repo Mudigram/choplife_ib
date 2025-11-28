@@ -65,6 +65,9 @@ export interface IbadanEvent {
   ticket_link: string | null;
   lat?: number | null;
   lng?: number | null;
+  attendee_count?: number | null;
+  what_to_expect?: string[] | null;
+  dress_code?: string | null;
 }
 
 // -------------------------

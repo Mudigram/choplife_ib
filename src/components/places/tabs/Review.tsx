@@ -11,14 +11,17 @@ import {
     Loader2,
 } from "lucide-react";
 import Image from "next/image";
+import WriteReviewButton from "@/components/reviews/WriteReviewButton";
+import { refresh } from "next/cache";
 
 type Props = {
     placeId: string;
     avgRating?: number | null;
     totalReviews?: number | null;
+    placeName?: string;
 };
 
-export default function ReviewsTab({ placeId, avgRating = null, totalReviews = null }: Props) {
+export default function ReviewsTab({ placeId, avgRating = null, totalReviews = null, placeName }: Props) {
     const { reviews, loading, error, fetchNext, hasMore } = useReviews({
         placeId,
         pageSize: 8,
@@ -140,9 +143,7 @@ export default function ReviewsTab({ placeId, avgRating = null, totalReviews = n
                             <ReviewCard
                                 review={r}
                                 onOpenGallery={openGallery}
-                                onHelpful={() => {
-                                    r.likes_count = (r.likes_count ?? 0) + 1;
-                                }}
+
                             />
                         </motion.div>
                     ))}
@@ -180,6 +181,13 @@ export default function ReviewsTab({ placeId, avgRating = null, totalReviews = n
                 initialIndex={galleryOpen.index}
                 onClose={closeGallery}
             />
+
+            <WriteReviewButton
+                placeId={placeId}
+                placeName={placeName}
+                onReviewSubmitted={refresh}
+            />
+
         </div>
     );
 }

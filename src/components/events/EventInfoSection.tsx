@@ -10,10 +10,12 @@ export default function EventInfoSection({ event }: EventInfoSectionProps) {
         <div className="px-4 py-4 max-w-lg mx-auto">
             {/* Quick Info */}
             <div className="grid grid-cols-2 gap-4 mb-4">
-                {event?.price_range && (
+                {event?.price_ngn !== undefined && (
                     <div className="bg-white/5 border border-white/10 rounded-lg p-3">
                         <p className="text-gray-400 text-xs mb-1">Price</p>
-                        <p className="text-white font-semibold">{event.price_range}</p>
+                        <p className="text-white font-semibold">
+                            {event.price_ngn === 0 ? "Free" : `₦${event.price_ngn.toLocaleString()}`}
+                        </p>
                     </div>
                 )}
                 {event?.location && (

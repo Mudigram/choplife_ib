@@ -140,20 +140,32 @@ export function useFavorites(userId?: string) {
 
       setFavorites((prev) => [...prev, newFav]);
 
+      // Debug logging
+      const insertData = {
+        user_id: userId,
+        place_id: item.type === "place" ? String(item.id) : null,
+        event_id: item.type === "event" ? Number(item.id) : null,
+      };
+      console.log("🔍 Attempting to insert favorite:", insertData);
+
       const { data, error } = await supabase
         .from("favorites")
-        .insert({
-          user_id: userId,
-          place_id: item.type === "place" ? String(item.id) : null,
-          event_id: item.type === "event" ? Number(item.id) : null,
-        })
+        .insert(insertData)
         .select()
         .single();
 
       if (error) {
         // Revert on error
+        console.error("❌ Failed to insert favorite:", error);
+        console.error("📊 Error details:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
         setFavorites((prev) => prev.filter((f) => f.id !== tempId));
       } else if (data) {
+        console.log("✅ Successfully inserted favorite:", data);
         // Replace temp ID with real ID
         setFavorites((prev) => prev.map((f) => (f.id === tempId ? data : f)));
       }

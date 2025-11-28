@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase/supabaseClient";
 import { useEffect } from "react";
 import { setUser, clearUser } from "@/redux/slices/authSlice";
 import { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import QueryProvider from "./QueryProvider";
 
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -39,7 +40,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     return (
         <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
-                {children}
+                <QueryProvider>
+                    {children}
+                </QueryProvider>
             </PersistGate>
         </Provider>
     );

@@ -29,12 +29,13 @@ export default function IBSpotlight({
             </h2>
 
             <div className="flex space-x-4 overflow-x-auto scrollbar-none pb-2 snap-x snap-mandatory">
-                {spotlight.map((item) => (
+                {spotlight.map((item, index) => (
                     <SpotlightCard
                         key={item.id}
                         item={item}
                         userName={userName}
                         userLocation={userLocation}
+                        index={index}
                     />
                 ))}
             </div>
@@ -47,10 +48,12 @@ function SpotlightCard({
     item,
     userName,
     userLocation,
+    index = 0,
 }: {
     item: FeaturedSpotlight;
     userName?: string;
     userLocation?: string;
+    index?: number;
 }) {
     const personalizedHook = userName
         ? `Welcome Back, ${userName}! ${item.headline}`
@@ -75,6 +78,9 @@ function SpotlightCard({
               object-cover transition-transform duration-700
               group-hover:scale-110 group-hover:translate-x-2
             "
+                    sizes="340px"
+                    priority={index < 2}
+                    quality={85}
                 />
             </div>
 

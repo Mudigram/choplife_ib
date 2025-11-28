@@ -2,6 +2,11 @@ import React from "react";
 import type { IbadanEvent } from "@/types/events";
 import { Calendar, MapPin, DollarSign, Users } from "lucide-react";
 import { motion } from "framer-motion";
+import AttendeesSection from "../AttendeesSection";
+import OrganizerCard from "../OrganizerCard";
+import FAQSection from "../FAQSection";
+import WhatToExpect from "../WhatToExpect";
+import ContactSection from "../ContactSection";
 
 type Props = {
     event?: Partial<IbadanEvent> | null;
@@ -43,6 +48,21 @@ export default function EventDetailsTab({ event }: Props) {
                 </section>
             )}
 
+            {/* ATTENDEES SECTION */}
+            {event?.id && <AttendeesSection eventId={event.id} />}
+
+            {/* WHAT TO EXPECT */}
+            {event && <WhatToExpect event={event} />}
+
+            {/* ORGANIZER CARD */}
+            {event?.organizer_id && <OrganizerCard organizerId={event.organizer_id} />}
+
+            {/* FAQ SECTION */}
+            {event?.id && <FAQSection eventId={event.id} />}
+
+            {/* CONTACT SECTION */}
+            <ContactSection organizerId={event?.organizer_id} />
+
             {/* EVENT INFO */}
             <section className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md shadow-sm space-y-3">
                 <h2 className="text-lg font-semibold text-white">Information</h2>
@@ -82,22 +102,22 @@ export default function EventDetailsTab({ event }: Props) {
                         </div>
                     )}
 
-                    {event?.price_range && (
+                    {event?.price_ngn && (
                         <div className="flex items-start gap-3">
                             <DollarSign size={18} className="text-[var(--color-chop-accent-point)] mt-0.5" />
                             <div>
                                 <p className="font-medium text-white">Price</p>
-                                <p className="text-sm">{event.price_range}</p>
+                                <p className="text-sm">{event.price_ngn}</p>
                             </div>
                         </div>
                     )}
 
-                    {event?.organizer && (
+                    {event?.organizer_id && (
                         <div className="flex items-start gap-3">
                             <Users size={18} className="text-[var(--color-chop-accent-point)] mt-0.5" />
                             <div>
                                 <p className="font-medium text-white">Organizer</p>
-                                <p className="text-sm">{event.organizer}</p>
+                                <p className="text-sm">{event.organizer_id}</p>
                             </div>
                         </div>
                     )}

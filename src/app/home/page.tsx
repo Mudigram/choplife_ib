@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/Spinner";
 import { useSelector } from "react-redux";
@@ -18,9 +18,12 @@ import { useEventSection } from "@/hooks/useEventSections";
 import { useNearbyPlaces } from "@/hooks/useNearbyPlaces";
 import { useCollectionPlaces } from "@/hooks/useCollectionPlaces";
 import MapView from "@/components/map/MapView";
-import { Map as MapIcon, List } from "lucide-react";
+import { Map as MapIcon, List, Calendar, MapPin, Store } from "lucide-react";
 import { UserProfile } from "@/types/user";
 import { useFavorites } from "@/hooks/useFavorites";
+import EmptyState from "@/components/home/EmptyState";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { RefreshCw } from "lucide-react";
 
 // ... imports
 
@@ -47,26 +50,34 @@ export default function HomePage() {
         if (!user) router.push("/login");
     }, [user, router]);
 
-    // Initialize location from profile
+    // Consolidated location initialization - runs only once on mount
     useEffect(() => {
+        // Priority 1: Use profile location if available
         if (profile?.location) {
             setLocationName(profile.location);
             if (profile.latitude && profile.longitude) {
                 setCoords({ lat: profile.latitude, lng: profile.longitude });
             }
-        } else if ("geolocation" in navigator && !coords.lat) {
-            // Only try geolocation if no profile location and no coords yet
+            return; // Don't request geolocation if we have profile location
+        }
+
+        // Priority 2: Fall back to browser geolocation
+        if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
                     const { latitude, longitude } = position.coords;
-                    handleLocationChange("Current Location", latitude, longitude);
+                    setCoords({ lat: latitude, lng: longitude });
+                    const locationName = await reverseGeocode(latitude, longitude);
+                    setLocationName(locationName);
+                    setArea(locationName);
                 },
                 (error) => {
                     console.log("Location access denied or error:", error);
                 }
             );
         }
-    }, [profile]);
+    }, [profile]); // Only re-run when profile changes
+
     const { itemscat } = usePlacesByCategoryArea({ category, area, limit: 12 });
 
     // 2. Geospatial fetch (Optimal)
@@ -98,20 +109,6 @@ export default function HomePage() {
         }
     };
 
-    useEffect(() => {
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    handleLocationChange("Current Location", latitude, longitude);
-                },
-                (error) => {
-                    console.log("Location access denied or error:", error);
-                }
-            );
-        }
-    }, []);
-
     const fallbackProfile: UserProfile = {
         id: user?.id || "",
         username: user?.user_metadata?.username || user?.email?.split("@")[0] || "Guest",
@@ -120,8 +117,8 @@ export default function HomePage() {
 
     const profileData = profile || fallbackProfile;
 
-    // Map events to ScrollItems
-    const eventItems = events.map(e => ({
+    // Memoized transformations to prevent unnecessary recalculations
+    const eventItems = useMemo(() => events.map(e => ({
         id: e.id,
         title: e.title,
         image_url: e.thumbnail,
@@ -132,15 +129,55 @@ export default function HomePage() {
         lat: e.lat,
         lng: e.lng,
         isFavorite: isFavorite(e.id)
-    }));
+    })), [events, isFavorite]);
 
-    // Map isFavorite to items
-    const itemsWithFavorites = items.map(item => ({ ...item, isFavorite: isFavorite(item.id) }));
-    const collectionItemsWithFavorites = collectionItems.map(item => ({ ...item, isFavorite: isFavorite(item.id) }));
-    const displayItemsWithFavorites = displayItems.map(item => ({ ...item, isFavorite: isFavorite(item.id) }));
+    // Memoize favorite mappings for performance
+    const itemsWithFavorites = useMemo(() =>
+        items.map(item => ({ ...item, isFavorite: isFavorite(item.id) })),
+        [items, isFavorite]
+    );
+
+    const collectionItemsWithFavorites = useMemo(() =>
+        collectionItems.map(item => ({ ...item, isFavorite: isFavorite(item.id) })),
+        [collectionItems, isFavorite]
+    );
+
+    const displayItemsWithFavorites = useMemo(() =>
+        displayItems.map(item => ({ ...item, isFavorite: isFavorite(item.id) })),
+        [displayItems, isFavorite]
+    );
+
+    // Pull-to-refresh functionality
+    const handleRefresh = async () => {
+        // Force reload the page to refetch all data
+        window.location.reload();
+    };
+
+    const { containerRef, isRefreshing, pullDistance } = usePullToRefresh(handleRefresh);
 
     return (
-        <div className="bg-chop-bg-dark min-h-screen overflow-hidden">
+        <div
+            ref={containerRef}
+            className="bg-chop-bg-dark min-h-screen overflow-hidden"
+            style={{ position: 'relative' }}
+        >
+            {/* Pull-to-Refresh Indicator */}
+            {pullDistance > 0 && (
+                <div
+                    className="fixed top-0 left-0 right-0 flex justify-center items-center z-50 transition-all"
+                    style={{
+                        transform: `translateY(${pullDistance}px)`,
+                        opacity: pullDistance / 60
+                    }}
+                >
+                    <div className="bg-chop-bg-card backdrop-blur-xl border border-white/10 rounded-full p-3 shadow-xl">
+                        <RefreshCw
+                            size={20}
+                            className={`text-chop-accent-cta ${isRefreshing || pullDistance > 60 ? 'animate-spin' : ''}`}
+                        />
+                    </div>
+                </div>
+            )}
 
             <HomeHeader
                 user={profileData}
@@ -149,8 +186,8 @@ export default function HomePage() {
             />
 
             <IBSpotlight
-                userName="Mudi"
-                userLocation="Lekki Phase 1" />
+                userName={profileData.username}
+                userLocation={locationName} />
             <div className="p-4 max-w-lg mx-auto">
                 <CategoryFilterBar
                     selected={activeCollection}
@@ -167,61 +204,94 @@ export default function HomePage() {
                 <span className="font-medium">{showMap ? "List" : "Map"}</span>
             </button>
 
-            {showMap ? (
-                <div className="p-4 h-screen pb-48">
-                    <MapView
-                        items={activeCollection ? collectionItems : [...eventItems, ...displayItems, ...items]}
-                        userLocation={coords.lat && coords.lng ? { lat: coords.lat, lng: coords.lng } : undefined}
-                    />
-                </div>
-            ) : (
-                <>
-                    {activeCollection ? (
-                        // Collection View
-                        <div className="min-h-[50vh]">
-                            <HorizontalScrollSection
-                                title={`Best for ${activeCollection.replace("_", " ")}`}
-                                items={collectionItemsWithFavorites}
-                                onItemClick={(item) => router.push(`/places/${item.id}`)}
-                                onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
-                            />
-                            {collectionLoading && <Spinner size="lg" message="Curating..." full />}
-                            {collectionItems.length === 0 && !collectionLoading && (
-                                <p className="text-center text-gray-400 mt-10">No spots found for this vibe yet.</p>
-                            )}
-                        </div>
-                    ) : (
-                        // Default View
-                        <>
-                            {/* Events Section */}
-                            <HorizontalScrollSection
-                                title="Hot Events This Week 🔥"
-                                items={eventItems}
-                                onItemClick={(item) => router.push(`/events/${item.id}`)}
-                                onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "event" })}
-                            />
-                            {eventsLoading && <Spinner size="sm" message="Loading Events..." />}
-
-                            <HorizontalScrollSection
-                                title="Popular In Ibadan"
-                                items={itemsWithFavorites}
-                                onItemClick={(item) => router.push(`/places/${item.id}`)}
-                                onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
-                            />
-                            {loading && <Spinner size="lg" message="Loading Popular Places" full />}
-                            <div className="mb-4">
+            {
+                showMap ? (
+                    <div className="p-4 h-screen pb-48">
+                        <MapView
+                            items={activeCollection ? collectionItems : [...eventItems, ...displayItems, ...items]}
+                            userLocation={coords.lat && coords.lng ? { lat: coords.lat, lng: coords.lng } : undefined}
+                        />
+                    </div>
+                ) : (
+                    <>
+                        {activeCollection ? (
+                            // Collection View
+                            <div className="min-h-[50vh]">
                                 <HorizontalScrollSection
-                                    title={displayTitle}
-                                    items={displayItemsWithFavorites}
-                                    onItemClick={(i) => router.push(`/places/${i.id}`)}
+                                    title={`Best for ${activeCollection.replace("_", " ")}`}
+                                    items={collectionItemsWithFavorites}
+                                    onItemClick={(item) => router.push(`/places/${item.id}`)}
                                     onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
                                 />
-                                {nearbyLoading && <p className="text-xs text-center text-gray-500">Finding closest spots...</p>}
+                                {collectionLoading && <Spinner size="lg" message="Curating..." full />}
+                                {collectionItems.length === 0 && !collectionLoading && (
+                                    <p className="text-center text-gray-400 mt-10">No spots found for this vibe yet.</p>
+                                )}
                             </div>
-                        </>
-                    )}
-                </>
-            )}
-        </div>
+                        ) : (
+                            // Default View
+                            <>
+                                {/* Events Section */}
+                                <HorizontalScrollSection
+                                    title="Hot Events This Week 🔥"
+                                    items={eventItems}
+                                    onItemClick={(item) => router.push(`/events/${item.id}`)}
+                                    onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "event" })}
+                                />
+                                {eventsLoading && <Spinner size="lg" message="Loading Events..." />}
+                                {!eventsLoading && eventItems.length === 0 && (
+                                    <EmptyState
+                                        icon={<Calendar size={64} />}
+                                        title="No Hot Events This Week"
+                                        description="Check out all upcoming events happening in Ibadan"
+                                        ctaText="Explore All Events"
+                                        ctaLink="/events"
+                                    />
+                                )}
+
+                                <HorizontalScrollSection
+                                    title="Popular In Ibadan"
+                                    items={itemsWithFavorites}
+                                    onItemClick={(item) => router.push(`/places/${item.id}`)}
+                                    onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
+                                />
+                                {popularLoading && <Spinner size="lg" message="Loading Popular Places" full />}
+                                {!popularLoading && itemsWithFavorites.length === 0 && (
+                                    <EmptyState
+                                        icon={<Store size={64} />}
+                                        title="No Popular Places Yet"
+                                        description="Discover amazing restaurants, lounges, and activities in Ibadan"
+                                        ctaText="Browse Places"
+                                        ctaLink="/places"
+                                    />
+                                )}
+                                <div className="mb-4">
+                                    <HorizontalScrollSection
+                                        title={displayTitle}
+                                        items={displayItemsWithFavorites}
+                                        onItemClick={(i) => router.push(`/places/${i.id}`)}
+                                        onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
+                                    />
+                                    {nearbyLoading && <p className="text-xs text-center text-gray-500">Finding closest spots...</p>}
+                                    {!nearbyLoading && displayItemsWithFavorites.length === 0 && (
+                                        <EmptyState
+                                            icon={<MapPin size={64} />}
+                                            title={coords.lat && coords.lng ? "No Places Found Nearby" : "Location Not Set"}
+                                            description={
+                                                coords.lat && coords.lng
+                                                    ? "Try expanding your search radius or browse all places"
+                                                    : "Enable location to discover places near you"
+                                            }
+                                            ctaText="Browse All Places"
+                                            ctaLink="/places"
+                                        />
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </>
+                )
+            }
+        </div >
     );
 }

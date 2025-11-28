@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CircleArrowRight } from "lucide-react";
@@ -16,9 +16,12 @@ interface EventProps {
     };
 }
 
-export default function EventCardSmall({ event }: EventProps) {
-    const date = dayjs(event.start_date_time).format("DD MMM");
-    const time = dayjs(event.start_date_time).format("h:mm A");
+function EventCardSmall({ event }: EventProps) {
+    // Memoize date formatting
+    const { date, time } = useMemo(() => ({
+        date: dayjs(event.start_date_time).format("DD MMM"),
+        time: dayjs(event.start_date_time).format("h:mm A"),
+    }), [event.start_date_time]);
 
     return (
         <Link href={`/event/${event.id}`}>
@@ -71,3 +74,5 @@ export default function EventCardSmall({ event }: EventProps) {
         </Link>
     );
 }
+
+export default React.memo(EventCardSmall);

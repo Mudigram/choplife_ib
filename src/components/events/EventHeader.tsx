@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import type { IbadanEvent } from '@/types/events';
-import { CircleArrowLeft, Share, Heart, Check } from "lucide-react";
+import { CircleArrowLeft, Heart } from "lucide-react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useFavorites } from "@/hooks/useFavorites";
+import ShareButtons from './ShareButtons';
+import EventCountdown from './EventCountdown';
 
 type EventHeaderProps = {
     event: Partial<IbadanEvent>;
@@ -16,8 +18,6 @@ type EventHeaderProps = {
 export default function EventHeader({ event }: EventHeaderProps) {
     const user = useSelector((state: RootState) => state.auth.user);
     const { isFavorite, toggleFavorite } = useFavorites(user?.id);
-    const [showCopied, setShowCopied] = useState(false);
-
     const defaultHeader = "/assets/header/header1.jpg";
     const imageUrl = event?.thumbnail || defaultHeader;
     const title = event?.title || "Event";
@@ -26,33 +26,6 @@ export default function EventHeader({ event }: EventHeaderProps) {
     const handleFavorite = () => {
         if (eventId) {
             toggleFavorite({ id: eventId, type: "event" });
-        }
-    };
-
-    const handleShare = async () => {
-        const url = window.location.href;
-
-        // Try native share API first (mobile)
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: title,
-                    text: `Check out ${title} on ChopLife!`,
-                    url: url,
-                });
-                return;
-            } catch (err) {
-                // User cancelled or error, fall back to copy
-            }
-        }
-
-        // Fallback: copy to clipboard
-        try {
-            await navigator.clipboard.writeText(url);
-            setShowCopied(true);
-            setTimeout(() => setShowCopied(false), 2000);
-        } catch (err) {
-            console.error("Failed to copy:", err);
         }
     };
 
@@ -117,16 +90,10 @@ export default function EventHeader({ event }: EventHeaderProps) {
                         />
                     </button>
 
-                    <button
-                        onClick={handleShare}
-                        className="relative p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition"
-                    >
-                        {showCopied ? (
-                            <Check size={22} className="text-green-400" />
-                        ) : (
-                            <Share size={22} className="text-white" />
-                        )}
-                    </button>
+                    <ShareButtons
+                        title={title}
+                        description={event?.description || `Join us for ${title}!`}
+                    />
 
                 </div>
             </div>
@@ -137,9 +104,16 @@ export default function EventHeader({ event }: EventHeaderProps) {
 
                 {/* DATE & TIME */}
                 {eventDate && (
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-3">
                         <span className="text-yellow-400 font-semibold">📅 {eventDate}</span>
                         {eventTime && <span className="text-gray-300 text-sm">• {eventTime}</span>}
+                    </div>
+                )}
+
+                {/* Countdown Timer */}
+                {event?.start_date_time && (
+                    <div className="mb-3">
+                        <EventCountdown targetDate={event.start_date_time} />
                     </div>
                 )}
 

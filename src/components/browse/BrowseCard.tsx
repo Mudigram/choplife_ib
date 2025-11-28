@@ -22,7 +22,7 @@ type BrowseCardProps = {
     price?: string;
 };
 
-export default function BrowseCard({
+function BrowseCard({
     id,
     type,
     title,
@@ -132,3 +132,5 @@ export default function BrowseCard({
         </motion.div>
     );
 }
+
+export default React.memo(BrowseCard);

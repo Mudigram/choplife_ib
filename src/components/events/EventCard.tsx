@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import { Clock, Calendar, Heart } from "lucide-react";
 
@@ -25,30 +25,35 @@ const CATEGORY_COLORS: Record<Category, string> = {
     default: "from-gray-500 to-gray-700",
 };
 
-export default function EventCard({ event }: EventCardProps) {
+function EventCard({ event }: EventCardProps) {
     /** Map Supabase field names to display values */
     const imageUrl = (event.thumbnail as string) || "/assets/events/food2.jpg";
     const title = (event.title as string) || "Untitled Event";
 
-    // Parse start_date_time from Supabase (ISO format)
-    let eventDate = "TBD";
-    let eventTime = "TBD";
-    if (event.start_date_time && typeof event.start_date_time === "string") {
-        try {
-            const dateObj = new Date(event.start_date_time);
-            eventDate = dateObj.toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric"
-            });
-            eventTime = dateObj.toLocaleTimeString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        } catch {
-            console.error("Failed to parse date:", event.start_date_time);
+    // Memoize date parsing to avoid recalculation on every render
+    const { eventDate, eventTime } = useMemo(() => {
+        let date = "TBD";
+        let time = "TBD";
+
+        if (event.start_date_time && typeof event.start_date_time === "string") {
+            try {
+                const dateObj = new Date(event.start_date_time);
+                date = dateObj.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric"
+                });
+                time = dateObj.toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+            } catch {
+                console.error("Failed to parse date:", event.start_date_time);
+            }
         }
-    }
+
+        return { eventDate: date, eventTime: time };
+    }, [event.start_date_time]);
 
     /** Pick category glow */
     const glowColor =
@@ -120,3 +125,6 @@ export default function EventCard({ event }: EventCardProps) {
         </div>
     );
 }
+
+// Memoize the component to prevent unnecessary re-renders
+export default React.memo(EventCard);

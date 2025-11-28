@@ -5,24 +5,19 @@ import { supabase } from "@/lib/supabase/supabaseClient";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { setUser, setError, setLoading } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
-import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import Link from "next/link";
+import { Eye, EyeOff, Mail, Lock, Sparkles } from "lucide-react";
 
 export default function LoginPage() {
     const dispatch = useAppDispatch();
     const router = useRouter();
-    const { setTheme } = useTheme();
     const { loading, error } = useAppSelector((state) => state.auth);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [emailFocused, setEmailFocused] = useState(false);
+    const [passwordFocused, setPasswordFocused] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,68 +38,131 @@ export default function LoginPage() {
         if (data.user) {
             dispatch(setUser(data.user));
             dispatch(setLoading(false));
-            router.push("/dashboard");
+            router.push("/home");
         }
     };
 
     return (
-        <div className="max-w-sm mx-auto mt-20 bg-white rounded-xl p-6 shadow-md">
-            <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
-            <form onSubmit={handleLogin} className="space-y-4">
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email address"
-                    className="w-full p-2 border rounded-lg"
-                    required
-                />
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    className="w-full p-2 border rounded-lg"
-                    required
-                />
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full h-10 py-2 rounded-lg bg-chop-accent-cta text-chop-text-light shadow-neon-cta transition"
-                >
-                    {loading ? "Signing In..." : "Login"}
-                </button>
-                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-            </form>
-            <p className="text-center text-sm mt-4">
-                Don’t have an account?{" "}
-                <a href="/signup" className="text-blue-600 hover:underline">
-                    Sign up
-                </a>
-            </p>
-            <div className="flex justify-center mt-4">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="icon">
-                            <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                            <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                            <span className="sr-only">Toggle theme</span>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setTheme("light")}>
-                            Light
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setTheme("dark")}>
-                            Dark
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setTheme("system")}>
-                            System
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+        <div className="min-h-screen bg-chop-bg-dark flex items-center justify-center px-4 py-8">
+
+            {/* Main Card */}
+            <div className="relative w-full max-w-md">
+                {/* Brand Header */}
+                <div className="text-center mb-8 animate-fade-in">
+                    <div className="inline-flex items-center gap-2 mb-2">
+                        <Sparkles className="w-8 h-8 text-chop-accent-cta animate-pulse" />
+                        <h1 className="text-4xl font-bold bg-gradient-to-r from-chop-accent-cta via-chop-accent-point to-chop-accent-cta bg-clip-text text-transparent">
+                            ChopLife
+                        </h1>
+                    </div>
+                    <p className="text-chop-text-subtle text-sm">Discover. Explore. Experience Ibadan.</p>
+                </div>
+
+                {/* Glassmorphic Card */}
+                <div className="relative bg-chop-bg-card/10 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-[0_8px_32px_0_rgba(248,175,47,0.1)] ">
+                    <h2 className="text-2xl font-bold text-chop-text-light mb-2">Welcome Back</h2>
+                    <p className="text-chop-text-subtle text-sm mb-6">Sign in to continue your journey</p>
+
+                    <form onSubmit={handleLogin} className="space-y-5">
+                        {/* Email Input */}
+                        <div className="relative">
+                            <label
+                                className={`absolute left-12 transition-all duration-200 pointer-events-none ${emailFocused || email
+                                    ? "-top-2 text-xs text-chop-accent-cta bg-chop-bg-dark px-2"
+                                    : "top-4 text-chop-text-subtle"
+                                    }`}
+                            >
+                                Email Address
+                            </label>
+                            <Mail className="absolute left-4 top-4 w-5 h-5 text-chop-text-subtle" />
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                onFocus={() => setEmailFocused(true)}
+                                onBlur={() => setEmailFocused(false)}
+                                className="w-full h-14 pl-12 pr-4 bg-chop-bg-dark/50 border border-chop-text-subtle/20 rounded-xl text-chop-text-light placeholder-transparent focus:border-chop-accent-cta focus:ring-2 focus:ring-chop-accent-cta/20 transition-all outline-none"
+                                required
+                            />
+                        </div>
+
+                        {/* Password Input */}
+                        <div className="relative">
+                            <label
+                                className={`absolute left-12 transition-all duration-200 pointer-events-none ${passwordFocused || password
+                                    ? "-top-2 text-xs text-chop-accent-cta bg-chop-bg-dark px-2"
+                                    : "top-4 text-chop-text-subtle"
+                                    }`}
+                            >
+                                Password
+                            </label>
+                            <Lock className="absolute left-4 top-4 w-5 h-5 text-chop-text-subtle" />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                onFocus={() => setPasswordFocused(true)}
+                                onBlur={() => setPasswordFocused(false)}
+                                className="w-full h-14 pl-12 pr-12 bg-chop-bg-dark/50 border border-chop-text-subtle/20 rounded-xl text-chop-text-light placeholder-transparent focus:border-chop-accent-cta focus:ring-2 focus:ring-chop-accent-cta/20 transition-all outline-none"
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-4 top-4 text-chop-text-subtle hover:text-chop-accent-cta transition-colors"
+                            >
+                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                        </div>
+
+                        {/* Error Message */}
+                        {error && (
+                            <div className="bg-chop-accent-error/10 border border-chop-accent-error/30 rounded-xl p-3 text-chop-accent-error text-sm animate-shake">
+                                {error}
+                            </div>
+                        )}
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full h-14 bg-gradient-to-r from-chop-accent-cta to-chop-accent-point text-white font-bold rounded-xl shadow-[0_0_20px_rgba(248,175,47,0.4)] hover:shadow-[0_0_30px_rgba(248,175,47,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        >
+                            {loading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    Signing In...
+                                </span>
+                            ) : (
+                                "Sign In"
+                            )}
+                        </button>
+                    </form>
+
+                    {/* Divider */}
+                    <div className="flex items-center gap-4 my-6">
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-chop-text-subtle/30 to-transparent"></div>
+                        <span className="text-chop-text-subtle text-xs">OR</span>
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-chop-text-subtle/30 to-transparent"></div>
+                    </div>
+
+                    {/* Sign Up Link */}
+                    <p className="text-center text-chop-text-subtle text-sm">
+                        Don't have an account?{" "}
+                        <Link
+                            href="/signup"
+                            className="text-chop-accent-cta font-semibold hover:text-chop-accent-point transition-colors"
+                        >
+                            Create Account
+                        </Link>
+                    </p>
+                </div>
+
+                {/* Footer Text */}
+                <p className="text-center text-chop-text-subtle/60 text-xs mt-6">
+                    By continuing, you agree to ChopLife's Terms & Privacy Policy
+                </p>
             </div>
         </div>
-
     );
 }

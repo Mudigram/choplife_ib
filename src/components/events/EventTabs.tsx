@@ -3,9 +3,11 @@
 import { useState } from "react";
 import EventDetailsTab from "./tabs/EventDetailsTab";
 import EventLocationTab from "./tabs/EventLocationTab";
+import EventGalleryTab from "./tabs/EventGalleryTab";
+import TicketsTab from "./tabs/TicketsTab";
 import type { IbadanEvent } from "@/types/events";
 
-const tabs = ["Details", "Location"];
+const tabs = ["Details", "Location", "Gallery", "Tickets"];
 
 export default function EventTabs({
     eventId,
@@ -61,6 +63,8 @@ export default function EventTabs({
             <div className="mt-6">
                 {active === 0 && <EventDetailsTab event={event} />}
                 {active === 1 && <EventLocationTab event={event} />}
+                {active === 2 && <EventGalleryTab eventId={eventId || event.id} />}
+                {active === 3 && <TicketsTab eventId={eventId || event.id} ticketLink={event.ticket_link} />}
             </div>
         </div>
     );

@@ -4,9 +4,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect } from "react";
-import type { ScrollItem } from "@/components/home/HorizontalScrollSection";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { MapItem } from "@/types/map";
 
 // Fix for default marker icons in Next.js
 const iconUrl = "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png";
@@ -26,8 +26,9 @@ const DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 type Props = {
-    items: ScrollItem[];
+    items: MapItem[];
     userLocation?: { lat: number; lng: number };
+    className?: string; // Allow custom classes
 };
 
 function MapUpdater({ center }: { center: [number, number] }) {
@@ -38,7 +39,7 @@ function MapUpdater({ center }: { center: [number, number] }) {
     return null;
 }
 
-export default function LeafletMap({ items, userLocation }: Props) {
+export default function LeafletMap({ items, userLocation, className }: Props) {
     const router = useRouter();
 
     // Default center (Ibadan) if no user location
@@ -50,7 +51,7 @@ export default function LeafletMap({ items, userLocation }: Props) {
             center={center}
             zoom={13}
             style={{ height: "100%", width: "100%", borderRadius: "1rem" }}
-            className="z-0"
+            className={`z-0 ${className || ""}`}
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -69,13 +70,19 @@ export default function LeafletMap({ items, userLocation }: Props) {
                 if (!item.lat || !item.lng) return null;
                 return (
                     <Marker
-                        key={item.id}
+                        key={`${item.type}-${item.id}`}
                         position={[item.lat, item.lng]}
                     >
                         <Popup className="min-w-[200px]">
                             <div
                                 className="cursor-pointer"
-                                onClick={() => router.push(`/places/${item.id}`)}
+                                onClick={() => {
+                                    if (item.type === 'place') {
+                                        router.push(`/places/${item.id}`);
+                                    } else {
+                                        router.push(`/events/${item.slug || item.id}`);
+                                    }
+                                }}
                             >
                                 <div className="relative w-full h-24 mb-2 rounded-md overflow-hidden">
                                     {item.image_url ? (
@@ -91,7 +98,12 @@ export default function LeafletMap({ items, userLocation }: Props) {
                                 </div>
                                 <h3 className="font-bold text-sm">{item.title}</h3>
                                 <p className="text-xs text-gray-500">{item.subtitle}</p>
-                                {item.rating && <p className="text-xs text-yellow-500">⭐ {item.rating}</p>}
+
+                                <div className="flex items-center gap-2 mt-1">
+                                    {item.rating && <p className="text-xs text-yellow-500">⭐ {item.rating}</p>}
+                                    {item.type === 'event' && <span className="text-[10px] bg-purple-100 text-purple-800 px-1 rounded">Event</span>}
+                                    {item.type === 'place' && <span className="text-[10px] bg-orange-100 text-orange-800 px-1 rounded">Place</span>}
+                                </div>
                             </div>
                         </Popup>
                     </Marker>

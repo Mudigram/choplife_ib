@@ -1,15 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { BadgeCheck, Edit3 } from "lucide-react";
+import { BadgeCheck, Settings } from "lucide-react";
 import type { UserProfile } from "@/types/user";
+import { useRouter } from "next/navigation";
 
 type ProfileHeaderProps = {
     user: Partial<UserProfile>;
-    onEditClick?: () => void;
 };
 
-export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps) {
+export default function ProfileHeader({ user }: ProfileHeaderProps) {
+    const router = useRouter();
     const defaultAvatar =
         "https://ui-avatars.com/api/?name=" +
         encodeURIComponent(user?.full_name || "User") +
@@ -28,13 +29,14 @@ export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps)
                     className="rounded-full object-cover border-2 border-chop-text-light/20 shadow-md"
                 />
 
-                {/* Edit Icon */}
+
+                {/* Settings Icon */}
                 <button
-                    onClick={onEditClick}
-                    className="absolute bottom-0 right-0 bg-chop-bg-dark text-chop-text-light rounded-full p-1.5 shadow-md hover:bg-chop-bg-dark/80 transition border border-chop-text-light/10"
-                    title="Edit Profile"
+                    onClick={() => router.push("/settings")}
+                    className="absolute bottom-0 left-0 bg-chop-bg-dark text-chop-accent-cta rounded-full p-1.5 shadow-md hover:bg-chop-bg-dark/80 transition border border-chop-accent-cta/30 hover:border-chop-accent-cta/50"
+                    title="Settings"
                 >
-                    <Edit3 size={14} />
+                    <Settings size={14} />
                 </button>
             </div>
 

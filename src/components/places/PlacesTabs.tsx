@@ -67,7 +67,14 @@ export default function PlaceTabs({
             {/* CONTENT AREA */}
             <div className="mt-6">
                 {active === 0 && <MenuTab placeId={placeId} />}
-                {active === 1 && <ReviewsTab placeId={placeId} />}
+                {active === 1 && (
+                    <ReviewsTab
+                        placeId={placeId}
+                        avgRating={place.average_rating}
+                        totalReviews={place.total_reviews}
+                        placeName={place.name}
+                    />
+                )}
                 {active === 2 && <AboutTab place={place} />}
                 {active === 3 &&
                     (galleryLoading ? (
