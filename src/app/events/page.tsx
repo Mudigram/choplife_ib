@@ -7,8 +7,6 @@ import BrowseCard from "@/components/browse/BrowseCard";
 import Spinner from "@/components/ui/Spinner";
 import { Search, SlidersHorizontal, Calendar as CalendarIcon } from "lucide-react";
 
-// Filter Options
-const CATEGORIES = ["all", "Party", "Concert", "Workshop", "Meetup", "Comedy"];
 const SORT_OPTIONS = [
     { label: "Date (Soonest)", value: "date_asc" },
     { label: "Date (Latest)", value: "date_desc" },
@@ -27,6 +25,12 @@ export default function EventsPage() {
     const [category, setCategory] = useState<string>("all");
     const [search, setSearch] = useState<string>("");
     const [sortBy, setSortBy] = useState<string>("date_asc");
+
+    /** 🔥 Dynamic Categories */
+    const categories = useMemo(() => {
+        const uniqueCategories = new Set(allEvents.map(e => e.category).filter(Boolean));
+        return ["all", ...Array.from(uniqueCategories)];
+    }, [allEvents]);
 
     /** 🔥 Filtered & Sorted Events */
     const filteredEvents = useMemo(() => {
@@ -133,7 +137,7 @@ export default function EventsPage() {
                         {/* Categories */}
                         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                             <span className="text-xs text-gray-500 font-medium uppercase tracking-wider shrink-0">Category</span>
-                            {CATEGORIES.map((cat) => (
+                            {categories.map((cat) => (
                                 <button
                                     key={cat}
                                     onClick={() => setCategory(cat)}

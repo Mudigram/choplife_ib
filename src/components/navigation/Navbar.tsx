@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Home, Compass, User, Star, Search, LogIn } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -10,11 +10,36 @@ import { RootState } from "@/redux/store";
 
 export default function Navbar() {
     const pathname = usePathname();
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
 
-
-    const [activePath, setActivePath] = useState("/home");
     // ✅ Check if user is logged in from Redux
     const user = useSelector((state: RootState) => state.auth.user);
+
+    // 🚫 Hidden Routes (Auth, Landing, 404)
+    const HIDDEN_ROUTES = ["/", "/login", "/signup", "/forgot-password"];
+    const shouldHide = HIDDEN_ROUTES.includes(pathname);
+
+    // 📜 Scroll Logic
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            // Show if scrolling up or at top, hide if scrolling down
+            if (currentScrollY < lastScrollY || currentScrollY < 50) {
+                setIsVisible(true);
+            } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+                setIsVisible(false);
+            }
+
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
+
+    if (shouldHide) return null;
 
     const navItems = [
         { name: "Home", icon: Home, href: "/home", protected: false },
@@ -28,7 +53,10 @@ export default function Navbar() {
     const visibleNavItems = navItems.filter((item) => !item.protected || user);
 
     return (
-        <div className="fixed bottom-4 left-0 right-0 z-50 px-2 flex justify-center">
+        <div
+            className={`fixed bottom-6 left-0 right-0 z-50 px-2 flex justify-center transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-[150%]"
+                }`}
+        >
             <div
                 className=" 
        bg-chop-bg-card/10 text-chop-text-light flex justify-around items-center h-18 w-full 

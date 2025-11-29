@@ -35,7 +35,35 @@ export function useEvents() {
     };
 
     fetchPlaces();
-  }, []); // Empty dependency array - fetch once on mount
+
+    // Real-time subscription
+    const channel = supabase
+      .channel("realtime-events")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "ibadan_events" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            setEvents((prev) => [payload.new as IbadanEvent, ...prev]);
+          } else if (payload.eventType === "UPDATE") {
+            setEvents((prev) =>
+              prev.map((event) =>
+                event.id === payload.new.id ? (payload.new as IbadanEvent) : event
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setEvents((prev) =>
+              prev.filter((event) => event.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   return { events, loading, error };
 }

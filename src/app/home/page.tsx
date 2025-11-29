@@ -24,14 +24,17 @@ import { useFavorites } from "@/hooks/useFavorites";
 import EmptyState from "@/components/home/EmptyState";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { RefreshCw } from "lucide-react";
+import { useRecommendedPlaces } from "@/hooks/useRecommendedPlaces";
 
 // ... imports
 
 export default function HomePage() {
     const user = useSelector((state: RootState) => state.auth.user);
     const { profile, loading } = useProfile(user?.id);
-    const { items, loading: popularLoading } = usePopularPlaces(12);
+    const { items, loading: popularLoading, error: popularError } = usePopularPlaces(12);
     const { isFavorite, toggleFavorite } = useFavorites(user?.id);
+    const { items: recommendedItems, error: recommendedError } = useRecommendedPlaces(user?.id);
+
 
     // Fetch Events
     const { data: eventData, loading: eventsLoading } = useEventSection("hot-this-week");
@@ -237,6 +240,7 @@ export default function HomePage() {
                                     items={eventItems}
                                     onItemClick={(item) => router.push(`/events/${item.id}`)}
                                     onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "event" })}
+                                    viewAllLink="/events"
                                 />
                                 {eventsLoading && <Spinner size="lg" message="Loading Events..." />}
                                 {!eventsLoading && eventItems.length === 0 && (
@@ -251,12 +255,13 @@ export default function HomePage() {
 
                                 <HorizontalScrollSection
                                     title="Popular In Ibadan"
-                                    items={itemsWithFavorites}
+                                    items={items}
                                     onItemClick={(item) => router.push(`/places/${item.id}`)}
                                     onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
+                                    viewAllLink="/places"
                                 />
                                 {popularLoading && <Spinner size="lg" message="Loading Popular Places" full />}
-                                {!popularLoading && itemsWithFavorites.length === 0 && (
+                                {!popularLoading && items.length === 0 && (
                                     <EmptyState
                                         icon={<Store size={64} />}
                                         title="No Popular Places Yet"
@@ -265,12 +270,16 @@ export default function HomePage() {
                                         ctaLink="/places"
                                     />
                                 )}
+                                {popularError && <div className="text-red-500 text-center p-4">Error loading popular places: {popularError}</div>}
+                                {recommendedError && <div className="text-red-500 text-center p-4">Error loading recommended places: {recommendedError}</div>}
                                 <div className="mb-4">
+
                                     <HorizontalScrollSection
                                         title={displayTitle}
                                         items={displayItemsWithFavorites}
                                         onItemClick={(i) => router.push(`/places/${i.id}`)}
                                         onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
+                                        viewAllLink="/places"
                                     />
                                     {nearbyLoading && <p className="text-xs text-center text-gray-500">Finding closest spots...</p>}
                                     {!nearbyLoading && displayItemsWithFavorites.length === 0 && (
@@ -284,6 +293,18 @@ export default function HomePage() {
                                             }
                                             ctaText="Browse All Places"
                                             ctaLink="/places"
+                                        />
+                                    )}
+                                </div>
+
+                                <div>
+                                    {recommendedItems.length > 0 && (
+                                        <HorizontalScrollSection
+                                            title="Because You Liked..."
+                                            items={recommendedItems}
+                                            onItemClick={(item) => router.push(`/places/${item.id}`)}
+                                            onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
+                                            viewAllLink="/places"
                                         />
                                     )}
                                 </div>

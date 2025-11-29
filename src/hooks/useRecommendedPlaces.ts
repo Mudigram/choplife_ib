@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import type { ScrollItem } from "@/components/home/HorizontalScrollSection";
 
-async function fetchPopularPlaces(limit: number): Promise<ScrollItem[]> {
+async function fetchRecommendedPlaces(limit: number): Promise<ScrollItem[]> {
+  // In a real app, this would call an edge function or RPC that uses the user's preferences.
+  // For now, we'll fetch places with high ratings as a proxy for "Recommended".
   const { data, error } = await supabase
     .from("places")
     .select(`
@@ -13,20 +15,17 @@ async function fetchPopularPlaces(limit: number): Promise<ScrollItem[]> {
       rating,
       latitude,
       longitude
-
     `)
     .order("rating", { ascending: false })
     .limit(limit);
 
   if (error) {
-    console.error("Error fetching popular places:", error);
+    console.error("Error fetching recommended places:", error);
     throw new Error(error.message);
   }
 
-  console.log("Popular places data:", data);
+  console.log("Recommended places data:", data);
 
-
-  // Normalize for HorizontalScroll
   return (data ?? []).map((p) => ({
     id: p.id,
     title: p.name,
@@ -35,14 +34,14 @@ async function fetchPopularPlaces(limit: number): Promise<ScrollItem[]> {
     rating: p.rating,
     lat: p.latitude,
     lng: p.longitude,
-
   }));
 }
 
-export function usePopularPlaces(limit = 12) {
+export function useRecommendedPlaces(userId?: string, limit = 12) {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["places", "popular", limit],
-    queryFn: () => fetchPopularPlaces(limit),
+    queryKey: ["places", "recommended", userId, limit],
+    queryFn: () => fetchRecommendedPlaces(limit),
+    enabled: true,
   });
 
   return {

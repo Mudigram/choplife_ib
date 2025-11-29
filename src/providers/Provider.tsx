@@ -5,7 +5,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "@/redux/store";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import { useEffect } from "react";
-import { setUser, clearUser } from "@/redux/slices/authSlice";
+import { setUser, clearUser, setLoading, setError } from "@/redux/slices/authSlice";
 import { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import QueryProvider from "./QueryProvider";
 
@@ -19,6 +19,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             } else {
                 store.dispatch(clearUser());
             }
+            // 🛡️ Safety: Always reset loading/error on mount in case of stale persisted state
+            store.dispatch(setLoading(false));
+            store.dispatch(setError(null));
         });
 
         // Listen for auth state changes

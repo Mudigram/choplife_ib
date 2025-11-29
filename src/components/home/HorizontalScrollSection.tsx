@@ -3,7 +3,8 @@
 
 import Image from "next/image";
 import React from "react";
-import { Heart } from "lucide-react";
+import Link from "next/link";
+import { Heart, ChevronRight } from "lucide-react";
 
 export type ScrollItem = {
     id: string | number;
@@ -16,6 +17,7 @@ export type ScrollItem = {
     lat?: number | null;
     lng?: number | null;
     isFavorite?: boolean;
+    favorites_count?: number;
 };
 
 type Props = {
@@ -23,14 +25,27 @@ type Props = {
     items: ScrollItem[];
     onItemClick?: (item: ScrollItem) => void;
     onFavoriteToggle?: (item: ScrollItem) => void;
+    viewAllLink?: string;
+    viewAllText?: string;
 };
 
 const FALLBACK_BG = "/events/restview3.jpg"; // add a local image to public/
 
-export default function HorizontalScrollSection({ title, items, onItemClick, onFavoriteToggle }: Props) {
+export default function HorizontalScrollSection({ title, items, onItemClick, onFavoriteToggle, viewAllLink, viewAllText }: Props) {
     return (
         <section className="px-4 mb-8">
-            <h2 className="text-lg font-semibold mb-3 text-white">{title}</h2>
+            <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-semibold text-white">{title}</h2>
+                {viewAllLink && (
+                    <Link
+                        href={viewAllLink}
+                        className="flex items-center gap-1 text-sm text-chop-accent-cta hover:text-chop-accent-cta/80 transition-colors"
+                    >
+                        <span>{viewAllText}</span>
+                        <ChevronRight size={16} />
+                    </Link>
+                )}
+            </div>
 
             <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 snap-x snap-mandatory">
                 {items.map((item) => (
@@ -75,6 +90,14 @@ export default function HorizontalScrollSection({ title, items, onItemClick, onF
                                         height={160}
                                         className="object-cover"
                                     />
+                                </div>
+                            )}
+
+                            {item.favorites_count && item.favorites_count > 0 && (
+                                <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                                    <p className="text-xs text-gray-300">
+                                        {item.favorites_count} {item.favorites_count === 1 ? 'save' : 'saves'}
+                                    </p>
                                 </div>
                             )}
                         </div>
