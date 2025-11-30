@@ -68,6 +68,7 @@ export interface IbadanEvent {
   attendee_count?: number | null;
   what_to_expect?: string[] | null;
   dress_code?: string | null;
+  gallery_images?: string[] | null;
 }
 
 // -------------------------

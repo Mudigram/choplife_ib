@@ -1,16 +1,163 @@
 "use client";
 
-export default function AdminEventsPage() {
+import { useState } from "react";
+import { useAdminEvents } from "@/hooks/admin/useAdminEvents";
+import EventsTable from "@/components/admin/events/EventsTable";
+import EventForm from "@/components/admin/events/EventForm";
+import { Search, Plus, X } from "lucide-react";
+import { IbadanEvent } from "@/types/events";
+import { TicketTier } from "@/hooks/useEventTickets";
+import { supabase } from "@/lib/supabase/supabaseClient";
+
+export default function EventsPage() {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("all");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState<IbadanEvent | undefined>();
+    const [editingTickets, setEditingTickets] = useState<Partial<TicketTier>[]>([]);
+    const [loadingTickets, setLoadingTickets] = useState(false);
+
+    const { events, loading, createEvent, updateEvent, deleteEvent, fetchEvents } = useAdminEvents({
+        search: searchQuery,
+        category: categoryFilter,
+    });
+
+    const handleAdd = () => {
+        setEditingEvent(undefined);
+        setEditingTickets([]);
+        setIsModalOpen(true);
+    };
+
+    const handleEdit = async (event: IbadanEvent) => {
+        setEditingEvent(event);
+        setLoadingTickets(true);
+        setIsModalOpen(true);
+
+        // Fetch tickets for this event
+        const { data } = await supabase
+            .from("event_tickets")
+            .select("*")
+            .eq("event_id", event.id)
+            .order("sort_order", { ascending: true });
+
+        setEditingTickets(data || []);
+        setLoadingTickets(false);
+    };
+
+    const handleDelete = async (id: number) => {
+        if (confirm("Are you sure you want to delete this event?")) {
+            await deleteEvent(id);
+        }
+    };
+
+    const handleSubmit = async (data: Partial<IbadanEvent>, tickets: Partial<TicketTier>[], imageFile?: File) => {
+        let result;
+        if (editingEvent) {
+            result = await updateEvent(editingEvent.id, data, tickets, imageFile);
+        } else {
+            result = await createEvent(data, tickets, imageFile);
+        }
+
+        if (result.success) {
+            setIsModalOpen(false);
+            fetchEvents(); // Refresh list
+        } else {
+            alert("Error saving event: " + result.error);
+        }
+    };
+
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-chop-text-light">Events Management</h1>
-                <p className="text-chop-text-subtle mt-1">Manage all events in the system</p>
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-chop-text-light">Events Management</h1>
+                    <p className="text-chop-text-subtle mt-1">Manage events, parties, and tickets</p>
+                </div>
+                <button
+                    onClick={handleAdd}
+                    className="px-4 py-2 bg-chop-accent-cta text-black font-medium rounded-lg hover:bg-chop-accent-point transition-colors flex items-center gap-2"
+                >
+                    <Plus size={18} />
+                    Add Event
+                </button>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-xl p-8 text-center">
-                <p className="text-chop-text-subtle">Events management interface coming soon...</p>
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                        type="text"
+                        placeholder="Search events..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-chop-accent-cta transition-colors"
+                    />
+                </div>
+                <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-chop-accent-cta outline-none"
+                >
+                    <option value="all">All Categories</option>
+                    <option value="Party">Party</option>
+                    <option value="Tech">Tech</option>
+                    <option value="Music">Music</option>
+                    <option value="Comedy">Comedy</option>
+                </select>
             </div>
+
+            {/* List */}
+            {loading ? (
+                <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                        <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse" />
+                    ))}
+                </div>
+            ) : events.length === 0 ? (
+                <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">
+                    <p className="text-gray-400 text-lg">No events found</p>
+                </div>
+            ) : (
+                <EventsTable
+                    events={events}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
+            )}
+
+            {/* Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-chop-bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 shadow-2xl">
+                        <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-chop-bg-card border-b border-white/10">
+                            <h2 className="text-xl font-bold text-white">
+                                {editingEvent ? "Edit Event" : "Add New Event"}
+                            </h2>
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="text-gray-400 hover:text-white transition-colors"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            {loadingTickets ? (
+                                <div className="py-12 text-center text-gray-400">Loading details...</div>
+                            ) : (
+                                <EventForm
+                                    initialData={editingEvent}
+                                    initialTickets={editingTickets}
+                                    onSubmit={handleSubmit}
+                                    onCancel={() => setIsModalOpen(false)}
+                                    loading={loading}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
