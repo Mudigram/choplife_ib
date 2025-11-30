@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { toast } from "sonner";
 
 export type ReviewSubmissionData = {
     placeId: string;
@@ -63,6 +64,7 @@ export async function submitReview(data: ReviewSubmissionData) {
                 photo_url: photoUrl,
                 is_anonymous: data.isAnonymous,
                 is_verified: data.isVerified,
+                status: "pending", // Reviews start as pending
                 likes_count: 0,
                 created_at: new Date().toISOString(),
             })
@@ -73,16 +75,19 @@ export async function submitReview(data: ReviewSubmissionData) {
             throw new Error(`Review submission failed: ${reviewError.message}`);
         }
 
-        // Update place average rating and total reviews
+        // Update place average rating and total reviews (only count approved reviews)
         const { data: allReviews } = await supabase
             .from("reviews")
             .select("rating")
-            .eq("place_id", data.placeId);
+            .eq("place_id", data.placeId)
+            .eq("status", "approved"); // Only count approved reviews
 
         if (allReviews) {
             const totalReviews = allReviews.length;
             const averageRating =
-                allReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+                totalReviews > 0 
+                    ? allReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+                    : 0;
 
             await supabase
                 .from("places")
@@ -93,9 +98,11 @@ export async function submitReview(data: ReviewSubmissionData) {
                 .eq("id", data.placeId);
         }
 
+        toast.success("Review submitted! It will appear after approval.");
         return { success: true, data: reviewData };
     } catch (error: any) {
         console.error("Error submitting review:", error);
+        toast.error(error.message || "Failed to submit review");
         throw error;
     }
 }

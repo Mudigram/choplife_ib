@@ -75,6 +75,9 @@ export default function useReviews({
         query = query.eq("user_id", userId);
       }
 
+      // Only show approved reviews (admins can see all via admin panel)
+      query = query.eq("status", "approved");
+
       // Cursor pagination
       if (cursorRef.current) {
         query.lt("created_at", cursorRef.current);

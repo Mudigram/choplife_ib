@@ -173,15 +173,12 @@ export default function ReviewModal({
                                     >
                                         Close
                                     </button>
-                                    <button
-                                        onClick={() => {
-                                            // TODO: Link to verification process
-                                            onClose();
-                                        }}
-                                        className="px-6 py-2 rounded-xl bg-gradient-to-r from-chop-accent-cta to-chop-accent-point text-white font-semibold hover:shadow-[0_0_20px_rgba(248,175,47,0.4)] transition-all"
+                                    <a
+                                        href="/verification"
+                                        className="px-6 py-2 rounded-xl bg-gradient-to-r from-chop-accent-cta to-chop-accent-point text-white font-semibold hover:shadow-[0_0_20px_rgba(248,175,47,0.4)] transition-all inline-block"
                                     >
                                         How to Get Verified
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         ) : (

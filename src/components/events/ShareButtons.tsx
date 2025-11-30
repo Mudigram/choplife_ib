@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Share, X, Check, Facebook, Twitter, Instagram, Link as LinkIcon } from "lucide-react";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 type ShareButtonsProps = {
@@ -21,9 +22,11 @@ export default function ShareButtons({ title, url, description }: ShareButtonsPr
         try {
             await navigator.clipboard.writeText(shareUrl);
             setCopied(true);
+            toast.success("Link copied to clipboard");
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error("Failed to copy:", err);
+            toast.error("Failed to copy link");
         }
     };
 

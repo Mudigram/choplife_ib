@@ -21,6 +21,7 @@ import {
     EyeOff,
 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function SettingsPage() {
     const router = useRouter();
@@ -40,12 +41,14 @@ export default function SettingsPage() {
 
     const handleLogout = () => {
         dispatch(logoutUser());
+        toast.success("Logged out successfully");
         router.push("/");
     };
 
     const handleDeleteAccount = () => {
         // TODO: Implement actual account deletion
         console.log("Delete account requested");
+        toast.success("Account deleted successfully");
         setShowDeleteModal(false);
         handleLogout();
     };
@@ -100,14 +103,20 @@ export default function SettingsPage() {
                             label="Notifications"
                             description="Receive updates about events and places"
                             enabled={notificationsEnabled}
-                            onToggle={() => setNotificationsEnabled(!notificationsEnabled)}
+                            onToggle={() => {
+                                setNotificationsEnabled(!notificationsEnabled);
+                                toast.success(`Notifications ${!notificationsEnabled ? "enabled" : "disabled"}`);
+                            }}
                         />
                         <ToggleSetting
                             icon={MapPin}
                             label="Location Services"
                             description="Show nearby places and events"
                             enabled={locationEnabled}
-                            onToggle={() => setLocationEnabled(!locationEnabled)}
+                            onToggle={() => {
+                                setLocationEnabled(!locationEnabled);
+                                toast.success(`Location services ${!locationEnabled ? "enabled" : "disabled"}`);
+                            }}
                         />
                     </div>
                 </SettingsSection>

@@ -5,6 +5,7 @@ import { useEvents } from "@/hooks/useEvents";
 import MasonryGrid from "@/components/browse/MasonryGrid";
 import BrowseCard from "@/components/browse/BrowseCard";
 import Spinner from "@/components/ui/Spinner";
+import BrowseCardSkeleton from "@/components/ui/BrowseCardSkeleton";
 import { Search, SlidersHorizontal, Calendar as CalendarIcon } from "lucide-react";
 
 const SORT_OPTIONS = [
@@ -67,9 +68,33 @@ export default function EventsPage() {
     /** 🔥 Loading & Error */
     if (loading) {
         return (
-            <div className="w-full min-h-screen bg-chop-bg-dark text-center p-6 flex items-center justify-center">
-                <Spinner size="lg" message="Loading Events..." full />
-            </div>
+            <main className="w-full min-h-screen bg-chop-bg-dark text-white pb-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+                    {/* HEADER SKELETON */}
+                    <div className="mb-8 space-y-4">
+                        <div className="h-10 bg-white/10 rounded-lg w-64 animate-pulse" />
+                        <div className="h-5 bg-white/10 rounded-lg w-96 animate-pulse" />
+                    </div>
+
+                    {/* CONTROLS SKELETON */}
+                    <div className="sticky top-0 z-40 bg-chop-bg-dark/95 backdrop-blur-md py-4 mb-6 border-b border-white/10 space-y-4">
+                        <div className="flex flex-col md:flex-row gap-4 justify-between">
+                            <div className="w-full md:w-96 h-10 bg-white/10 rounded-full animate-pulse" />
+                            <div className="flex gap-2">
+                                <div className="w-24 h-8 bg-white/10 rounded-full animate-pulse" />
+                                <div className="w-24 h-8 bg-white/10 rounded-full animate-pulse" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* GRID SKELETON */}
+                    <MasonryGrid>
+                        {[...Array(8)].map((_, i) => (
+                            <BrowseCardSkeleton key={i} />
+                        ))}
+                    </MasonryGrid>
+                </div>
+            </main>
         );
     }
 
@@ -140,7 +165,7 @@ export default function EventsPage() {
                             {categories.map((cat) => (
                                 <button
                                     key={cat}
-                                    onClick={() => setCategory(cat)}
+                                    onClick={() => setCategory(cat as string)}
                                     className={`
                                         px-3 py-1 rounded-full text-xs whitespace-nowrap transition-all border
                                         ${category === cat

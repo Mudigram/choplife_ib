@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Search, MapPin, Calendar, Star } from "lucide-react";
 import { useSearch } from "@/hooks/useSearch";
 import Spinner from "@/components/ui/Spinner";
+import BrowseCardSkeleton from "@/components/ui/BrowseCardSkeleton";
 import Image from "next/image";
 import Link from "next/link";
 import { Place } from "@/types/place";
@@ -79,9 +80,10 @@ function SearchContent() {
             {/* Results Area */}
             <div className="max-w-lg mx-auto p-4 space-y-6">
                 {loading ? (
-                    <div className="py-12 text-center">
-                        <Spinner size="lg" />
-                        <p className="text-chop-text-subtle mt-4">Searching...</p>
+                    <div className="grid grid-cols-2 gap-4">
+                        {[...Array(6)].map((_, i) => (
+                            <BrowseCardSkeleton key={i} />
+                        ))}
                     </div>
                 ) : error ? (
                     <div className="text-center py-12 text-red-400">

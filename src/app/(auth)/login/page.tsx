@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { setUser, setError, setLoading } from "@/redux/slices/authSlice";
+import { setUser, setRole, setError, setLoading } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+import { getUserRole } from "@/lib/auth/roles";
 
 export default function LoginPage() {
     const dispatch = useAppDispatch();
@@ -30,13 +32,26 @@ export default function LoginPage() {
         });
 
         if (error) {
-            dispatch(setError(error.message));
+            if (error.message.includes("Email not confirmed")) {
+                toast.error("Please verify your email before logging in.");
+                dispatch(setError("Please verify your email address."));
+            } else {
+                dispatch(setError(error.message));
+                toast.error(error.message);
+            }
             dispatch(setLoading(false));
             return;
         }
 
         if (data.user) {
             dispatch(setUser(data.user));
+
+            // Fetch and set user role
+            const role = await getUserRole(data.user.id);
+            if (role) {
+                dispatch(setRole(role));
+            }
+
             dispatch(setLoading(false));
             router.push("/home");
         }

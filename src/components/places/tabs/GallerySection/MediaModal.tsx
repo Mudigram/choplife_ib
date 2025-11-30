@@ -2,8 +2,25 @@
 
 import Image from "next/image";
 import { X } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 export default function GalleryPreviewModal({ items, index, onClose }: any) {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (index !== null && containerRef.current) {
+            // Scroll to the clicked image
+            const imageElements = containerRef.current.children;
+            if (imageElements[index]) {
+                imageElements[index].scrollIntoView({
+                    behavior: "instant",
+                    block: "nearest",
+                    inline: "center"
+                });
+            }
+        }
+    }, [index]);
+
     if (index === null) return null;
 
     return (
@@ -21,6 +38,7 @@ export default function GalleryPreviewModal({ items, index, onClose }: any) {
           absolute top-6 right-6 p-3 rounded-full 
           bg-[var(--color-chop-accent-point)] 
           shadow-[0_0_12px_rgba(255,215,0,0.7)]
+          z-10
         "
             >
                 <X size={22} className="text-black font-bold" />
@@ -28,6 +46,7 @@ export default function GalleryPreviewModal({ items, index, onClose }: any) {
 
             {/* Swipe Container */}
             <div
+                ref={containerRef}
                 className="
           w-full h-full overflow-x-auto whitespace-nowrap 
           scroll-smooth snap-x snap-mandatory

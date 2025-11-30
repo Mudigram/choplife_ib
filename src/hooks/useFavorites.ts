@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
+import { toast } from "sonner";
 import { Favorite } from "@/types/favorites";
 import type { Place } from "@/types/place";
 import type { IbadanEvent } from "@/types/events";
@@ -126,6 +127,7 @@ export function useFavorites(userId?: string) {
     if (exists) {
       setFavorites((prev) => prev.filter((f) => f.id !== exists.id));
       setFavoritesWithDetails((prev) => prev.filter((f) => f.id !== exists.id));
+      toast.success("Removed from favorites");
       await supabase.from("favorites").delete().eq("id", exists.id);
     } else {
       // Create temp ID for optimistic UI
@@ -139,6 +141,7 @@ export function useFavorites(userId?: string) {
       };
 
       setFavorites((prev) => [...prev, newFav]);
+      toast.success("Added to favorites");
 
       // Debug logging
       const insertData = {
@@ -157,12 +160,7 @@ export function useFavorites(userId?: string) {
       if (error) {
         // Revert on error
         console.error("❌ Failed to insert favorite:", error);
-        console.error("📊 Error details:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
+        toast.error("Failed to add to favorites");
         setFavorites((prev) => prev.filter((f) => f.id !== tempId));
       } else if (data) {
         console.log("✅ Successfully inserted favorite:", data);

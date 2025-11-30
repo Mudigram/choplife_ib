@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { setUser, setError, setLoading } from "@/redux/slices/authSlice";
+import { setUser, setRole, setError, setLoading } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, User, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 export default function SignupPage() {
     const dispatch = useAppDispatch();
@@ -21,6 +22,8 @@ export default function SignupPage() {
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [usernameFocused, setUsernameFocused] = useState(false);
 
+    const [success, setSuccess] = useState(false);
+
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         dispatch(setLoading(true));
@@ -30,6 +33,7 @@ export default function SignupPage() {
             email,
             password,
             options: {
+                emailRedirectTo: `${window.location.origin}/auth/callback`,
                 data: {
                     username: username,
                 }
@@ -43,11 +47,49 @@ export default function SignupPage() {
         }
 
         if (data.user) {
-            dispatch(setUser(data.user));
             dispatch(setLoading(false));
-            router.push("/home");
+            setSuccess(true);
+            toast.success("Account created! Please check your email to verify.");
         }
     };
+
+    if (success) {
+        return (
+            <div className="min-h-screen bg-chop-bg-dark flex items-center justify-center px-4 py-8">
+                <div className="relative w-full max-w-md">
+                    <div className="text-center mb-8 animate-fade-in">
+                        <div className="inline-flex items-center gap-2 mb-2">
+                            <Sparkles className="w-8 h-8 text-chop-accent-cta animate-pulse" />
+                            <h1 className="text-4xl font-bold bg-gradient-to-r from-chop-accent-cta via-chop-accent-point to-chop-accent-cta bg-clip-text text-transparent">
+                                ChopLife
+                            </h1>
+                        </div>
+                    </div>
+
+                    <div className="relative bg-chop-bg-card/40 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-[0_8px_32px_0_rgba(248,175,47,0.1)] text-center">
+                        <div className="w-16 h-16 bg-chop-accent-cta/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Mail className="w-8 h-8 text-chop-accent-cta" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-chop-text-light mb-2">Check your inbox</h2>
+                        <p className="text-chop-text-subtle text-sm mb-6">
+                            We've sent a verification link to <br />
+                            <span className="text-chop-text-light font-medium">{email}</span>
+                        </p>
+                        <p className="text-chop-text-subtle/80 text-xs mb-6">
+                            Click the link in the email to verify your account and sign in.
+                        </p>
+
+                        <Link
+                            href="/login"
+                            className="inline-flex items-center justify-center gap-2 text-chop-accent-cta font-semibold hover:text-chop-accent-point transition-colors"
+                        >
+                            Back to Sign In
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-chop-bg-dark flex items-center justify-center px-4 py-8">

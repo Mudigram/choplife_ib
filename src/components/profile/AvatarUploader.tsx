@@ -7,6 +7,7 @@ import { updateAvatarUrl } from "@/redux/slices/userSlice";
 import { Camera } from "lucide-react";
 import Image from "next/image";
 import { useAppSelector } from "@/redux/store";
+import { toast } from "sonner";
 
 export default function AvatarUploader() {
     const dispatch = useDispatch();
@@ -22,8 +23,10 @@ export default function AvatarUploader() {
             const url = await uploadAvatar(user.id, file);
 
             dispatch(updateAvatarUrl(url));
+            toast.success("Avatar updated successfully");
         } catch (error) {
             console.error("Error uploading avatar:", error);
+            toast.error("Failed to upload avatar");
         } finally {
             setUploading(false);
         }

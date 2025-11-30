@@ -31,7 +31,7 @@ export default function ProfileTabs({ user, activeTab, onTabChange }: ProfileTab
 
     return (
         <div className="w-full">
-            <div className="flex justify-around border-b sticky top-62 z-10 bg-chop-bg-dark border-white/10">
+            <div className="flex justify-around border-b sticky top-56 z-10 bg-chop-bg-dark border-white/10">
                 {tabs.map(({ id, label, icon: Icon }) => (
                     <button
                         key={id}

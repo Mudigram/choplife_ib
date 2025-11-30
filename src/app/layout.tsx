@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Providers from "@/providers/Provider";
 import Navbar from "@/components/navigation/Navbar";
+import { Toaster } from "sonner";
 
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function RootLayout({
           <Providers>
             {children}
             <Navbar />
+            <Toaster position="top-center" richColors />
           </Providers>
 
         </ThemeProvider>
