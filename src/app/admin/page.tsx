@@ -2,6 +2,9 @@
 
 import { useAdminStats } from "@/hooks/admin/useAdminStats";
 import StatCard from "@/components/admin/dashboard/StatCard";
+import RecentActivityFeed from "@/components/admin/dashboard/RecentActivityFeed";
+import QuickActions from "@/components/admin/dashboard/QuickActions";
+import DashboardChart from "@/components/admin/dashboard/DashboardChart";
 import { Users, MapPin, Calendar, MessageSquare } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -21,11 +24,11 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-10">
             {/* Page Header */}
             <div>
                 <h1 className="text-3xl font-bold text-chop-text-light">Dashboard</h1>
-                <p className="text-chop-text-subtle mt-1">Welcome to ChopLife Admin</p>
+                <p className="text-chop-text-subtle mt-1">Welcome back, Admin</p>
             </div>
 
             {/* Stats Grid */}
@@ -34,60 +37,68 @@ export default function AdminDashboard() {
                     title="Total Places"
                     value={stats.totalPlaces}
                     icon={MapPin}
-                    trend={{ value: 12, isPositive: true }}
-                    color="orange"
+                    color="text-orange-400"
                 />
                 <StatCard
                     title="Total Events"
                     value={stats.totalEvents}
                     icon={Calendar}
-                    trend={{ value: 8, isPositive: true }}
-                    color="yellow"
+                    color="text-pink-400"
                 />
                 <StatCard
                     title="Pending Reviews"
                     value={stats.pendingReviews}
                     icon={MessageSquare}
-                    color="blue"
-                    alert={stats.pendingReviews > 0}
+                    color="text-blue-400"
+                    trend={stats.pendingReviews > 0 ? `${stats.pendingReviews} to review` : "All caught up"}
+                    trendUp={stats.pendingReviews === 0}
                 />
                 <StatCard
                     title="Total Users"
                     value={stats.totalUsers}
                     icon={Users}
-                    trend={{ value: 24, isPositive: true }}
-                    color="green"
+                    color="text-green-400"
                 />
             </div>
 
-            {/* Charts Section - Coming Soon */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-                    <h2 className="text-xl font-semibold text-chop-text-light mb-4">
-                        User Growth
-                    </h2>
-                    <div className="h-64 flex items-center justify-center text-chop-text-subtle">
-                        Chart coming soon...
-                    </div>
-                </div>
+            {/* Main Content Stack */}
+            <div className="space-y-6">
+                <QuickActions />
 
-                <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-                    <h2 className="text-xl font-semibold text-chop-text-light mb-4">
-                        Review Activity
-                    </h2>
-                    <div className="h-64 flex items-center justify-center text-chop-text-subtle">
-                        Chart coming soon...
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left Column (2/3) - Chart & Activity */}
+                    <div className="lg:col-span-2 space-y-6">
+                        <DashboardChart />
+                        <RecentActivityFeed activities={stats.recentActivity} />
                     </div>
-                </div>
-            </div>
 
-            {/* Recent Activity */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-                <h2 className="text-xl font-semibold text-chop-text-light mb-4">
-                    Recent Activity
-                </h2>
-                <div className="text-chop-text-subtle text-center py-8">
-                    Activity feed coming soon...
+                    {/* Right Column (1/3) - System Status (and maybe other widgets later) */}
+                    <div className="space-y-6">
+                        {/* System Status Card */}
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+                            <h2 className="text-lg font-bold text-white mb-4">System Status</h2>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-400">Database</span>
+                                    <span className="text-green-400 flex items-center gap-1">
+                                        <span className="w-2 h-2 rounded-full bg-green-500" />
+                                        Online
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-400">Storage</span>
+                                    <span className="text-green-400 flex items-center gap-1">
+                                        <span className="w-2 h-2 rounded-full bg-green-500" />
+                                        Healthy
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-400">Version</span>
+                                    <span className="text-gray-300">v1.2.0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
