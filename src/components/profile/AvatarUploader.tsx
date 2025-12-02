@@ -22,8 +22,20 @@ export default function AvatarUploader() {
             setUploading(true);
             const url = await uploadAvatar(user.id, file);
 
-            dispatch(updateAvatarUrl(url));
-            toast.success("Avatar updated successfully");
+            // Add cache-busting timestamp to force image reload
+            const cacheBustedUrl = `${url}?t=${Date.now()}`;
+
+            // Update both user slice and auth slice to ensure propagation
+            dispatch(updateAvatarUrl(cacheBustedUrl));
+
+            // Also update auth slice if it exists
+            const authUser = (window as any).__REDUX_STORE__?.getState?.()?.auth?.user;
+            if (authUser) {
+                // Force a full page data refresh to update all avatar instances
+                window.location.reload();
+            }
+
+            toast.success("Avatar updated successfully! Page will refresh.");
         } catch (error) {
             console.error("Error uploading avatar:", error);
             toast.error("Failed to upload avatar");

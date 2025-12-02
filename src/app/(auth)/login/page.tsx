@@ -32,12 +32,30 @@ export default function LoginPage() {
         });
 
         if (error) {
-            if (error.message.includes("Email not confirmed")) {
-                toast.error("Please verify your email before logging in.");
-                dispatch(setError("Please verify your email address."));
+            // Handle different error cases with user-friendly messages
+            if (error.message.includes("Email not confirmed") || error.message.includes("email_not_confirmed")) {
+                const friendlyMessage = "Please verify your email address first. Check your inbox for the verification link we sent you.";
+                toast.error(friendlyMessage, { duration: 5000 });
+                dispatch(setError(friendlyMessage));
+            } else if (error.message.includes("Invalid login credentials")) {
+                const friendlyMessage = "Invalid email or password. Please check your credentials and try again.";
+                toast.error(friendlyMessage);
+                dispatch(setError(friendlyMessage));
+            } else if (error.message.includes("Email link is invalid or has expired")) {
+                const friendlyMessage = "Your verification link has expired. Please sign up again.";
+                toast.error(friendlyMessage);
+                dispatch(setError(friendlyMessage));
+            } else if (error.message.includes("User not found")) {
+                const friendlyMessage = "No account found with this email. Please sign up first.";
+                toast.error(friendlyMessage);
+                dispatch(setError(friendlyMessage));
             } else {
-                dispatch(setError(error.message));
-                toast.error(error.message);
+                // Generic fallback for other errors
+                const friendlyMessage = error.message.includes("network")
+                    ? "Network error. Please check your connection and try again."
+                    : "Unable to sign in. Please try again later.";
+                dispatch(setError(friendlyMessage));
+                toast.error(friendlyMessage);
             }
             dispatch(setLoading(false));
             return;

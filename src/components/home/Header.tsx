@@ -26,6 +26,7 @@ export default function HomeHeader({ user, location, onLocationChange }: HomeHea
 
     const defaultAvatar = "/assets/avatar/lisa.jpg";
     const defaultHeader = "/assets/header/header1.jpg";
+    const [imageError, setImageError] = useState(false);
 
     const handleLocationSelect = async (
         locationName: string,
@@ -58,13 +59,20 @@ export default function HomeHeader({ user, location, onLocationChange }: HomeHea
 
                 {/* Background Image and Overlay */}
                 <div className="absolute inset-0">
-                    <Image
-                        src={defaultHeader}
-                        fill
-                        alt="header background"
-                        className="object-cover rounded-b-2xl shadow-lg"
-                        priority
-                    />
+                    {!imageError ? (
+                        <Image
+                            src={defaultHeader}
+                            fill
+                            alt="header background"
+                            quality={100}
+                            unoptimized
+                            className="object-cover rounded-b-2xl shadow-lg"
+                            priority
+                            onError={() => setImageError(true)}
+                        />
+                    ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-chop-accent-cta/20 via-chop-bg-dark to-chop-accent-point/20 rounded-b-2xl" />
+                    )}
                     <div className="absolute inset-0 bg-black/80 rounded-b-2xl"></div>
                 </div>
 
@@ -79,10 +87,12 @@ export default function HomeHeader({ user, location, onLocationChange }: HomeHea
                             <Link href="/profile">
                                 <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-chop-accent-cta">
                                     <Image
+                                        key={user.avatar_url} // Force re-render on avatar change
                                         src={user.avatar_url || defaultAvatar}
                                         fill
                                         alt={`${user.username} avatar`}
                                         className="object-cover"
+                                        unoptimized // Prevent caching issues
                                         priority
                                     />
                                 </div>

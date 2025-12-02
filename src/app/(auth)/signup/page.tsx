@@ -6,8 +6,31 @@ import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { setUser, setRole, setError, setLoading } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Mail, Lock, User, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Sparkles, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
+
+// Helper function to translate Supabase errors to user-friendly messages
+function getFriendlyErrorMessage(error: string): string {
+    if (error.includes("Password should be at least")) {
+        return "Password must be at least 6 characters long.";
+    }
+    if (error.includes("User already registered")) {
+        return "An account with this email already exists. Please sign in instead.";
+    }
+    if (error.includes("Invalid email")) {
+        return "Please enter a valid email address.";
+    }
+    if (error.includes("Password should contain")) {
+        return "Password must contain at least one uppercase letter, one lowercase letter, and one number.";
+    }
+    if (error.includes("Signup requires a valid password")) {
+        return "Please enter a valid password (at least 6 characters).";
+    }
+    if (error.includes("Unable to validate email address")) {
+        return "Please enter a valid email address.";
+    }
+    return error; // Return original if no match
+}
 
 export default function SignupPage() {
     const dispatch = useAppDispatch();
@@ -41,7 +64,9 @@ export default function SignupPage() {
         });
 
         if (error) {
-            dispatch(setError(error.message));
+            const friendlyMessage = getFriendlyErrorMessage(error.message);
+            dispatch(setError(friendlyMessage));
+            toast.error(friendlyMessage);
             dispatch(setLoading(false));
             return;
         }
@@ -67,17 +92,22 @@ export default function SignupPage() {
                     </div>
 
                     <div className="relative bg-chop-bg-card/40 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-[0_8px_32px_0_rgba(248,175,47,0.1)] text-center">
-                        <div className="w-16 h-16 bg-chop-accent-cta/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Mail className="w-8 h-8 text-chop-accent-cta" />
+                        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                            <Mail className="w-8 h-8 text-green-400" />
                         </div>
-                        <h2 className="text-2xl font-bold text-chop-text-light mb-2">Check your inbox</h2>
-                        <p className="text-chop-text-subtle text-sm mb-6">
+                        <h2 className="text-2xl font-bold text-chop-text-light mb-2">Check Your Email!</h2>
+                        <p className="text-chop-text-subtle text-sm mb-4">
                             We've sent a verification link to <br />
-                            <span className="text-chop-text-light font-medium">{email}</span>
+                            <span className="text-chop-accent-cta font-medium">{email}</span>
                         </p>
-                        <p className="text-chop-text-subtle/80 text-xs mb-6">
-                            Click the link in the email to verify your account and sign in.
-                        </p>
+
+                        <div className="bg-chop-accent-cta/10 border border-chop-accent-cta/30 rounded-xl p-4 mb-6">
+                            <p className="text-chop-text-light text-sm font-medium mb-2">📧 Important: Verify Your Email</p>
+                            <p className="text-chop-text-subtle/80 text-xs">
+                                Click the verification link in your email to activate your account.
+                                Check your spam folder if you don't see it within a few minutes.
+                            </p>
+                        </div>
 
                         <Link
                             href="/login"
@@ -188,9 +218,13 @@ export default function SignupPage() {
                         </div>
 
                         {/* Password Hint */}
-                        <p className="text-chop-text-subtle text-xs -mt-2">
-                            Password must be at least 6 characters
-                        </p>
+                        <div className="text-xs space-y-1 -mt-2">
+                            <div className={`flex items-center gap-1 transition-colors ${password.length >= 6 ? "text-green-400" : "text-chop-text-subtle"
+                                }`}>
+                                {password.length >= 6 ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+                                <span>At least 6 characters</span>
+                            </div>
+                        </div>
 
                         {/* Error Message */}
                         {error && (

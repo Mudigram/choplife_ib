@@ -49,7 +49,7 @@ export default function FavoriteCard({ favorite, onUnfavorite, onClick }: Favori
                         e.stopPropagation();
                         onUnfavorite();
                     }}
-                    className="absolute top-2 right-2 z-10 p-2 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors"
+                    className="absolute top-2 right-2 z-1 p-2 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors"
                 >
                     <Heart size={16} className="fill-red-500 text-red-500" />
                 </button>
