@@ -68,13 +68,6 @@ export default function AvatarUploader() {
                     />
                 </label>
             </div>
-
-            <button
-                disabled={uploading}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg text-sm disabled:opacity-60"
-            >
-                {uploading ? "Uploading..." : "Change Avatar"}
-            </button>
         </div>
     );
 }
