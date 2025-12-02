@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { uploadAvatar } from "@/lib/supabase/uploadAvatars";
 import { updateAvatarUrl } from "@/redux/slices/userSlice";
-import { Camera } from "lucide-react";
+import { Camera, Pencil } from "lucide-react";
 import Image from "next/image";
 import { useAppSelector } from "@/redux/store";
 import { toast } from "sonner";
@@ -54,6 +54,9 @@ export default function AvatarUploader() {
                     className="w-24 h-24 rounded-full object-cover border border-gray-700"
                     alt="Avatar"
                 />
+                <div className="absolute bottom-0 right-0 bg-chop-bg-dark text-chop-accent-cta rounded-full p-1.5 shadow-md hover:bg-chop-bg-dark/80 transition border border-chop-accent-cta/30 hover:border-chop-accent-cta/50">
+                    <Pencil size={14} />
+                </div>
                 <label
                     htmlFor="avatar-upload"
                     className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 rounded-full cursor-pointer transition"
