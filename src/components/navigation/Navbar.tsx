@@ -54,7 +54,7 @@ export default function Navbar() {
 
     return (
         <div
-            className={`fixed bottom-6 left-0 right-0 z-50 px-2 flex justify-center transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-[150%]"
+            className={`fixed bottom-2 left-0 right-0 z-50 px-2 flex justify-center transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-[150%]"
                 }`}
         >
             <div
