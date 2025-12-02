@@ -1,25 +1,38 @@
 "use client";
 
-import { Calendar, Star, MapPin } from "lucide-react";
+import { Calendar, Star, MapPin, Loader2 } from "lucide-react";
+import { useUserStats } from "@/hooks/useUserStats";
 
 type OverviewTabProps = {
-    user: {
-        total_points?: number;
-        tags?: string[];
-        created_at?: string;
-        reviews_count?: number;
-        favorites_count?: number;
-    };
+    userId: string;
 };
 
-export default function OverviewTab({ user }: OverviewTabProps) {
+export default function OverviewTab({ userId }: OverviewTabProps) {
+    const { data: stats, isLoading, error } = useUserStats(userId);
+
+    if (isLoading) {
+        return (
+            <div className="p-5 flex items-center justify-center min-h-[300px]">
+                <Loader2 className="animate-spin text-chop-accent-cta" size={32} />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-5 text-center text-red-400">
+                Failed to load stats. Please try again.
+            </div>
+        );
+    }
+
     const {
         total_points = 0,
         tags = [],
         created_at,
         reviews_count = 0,
         favorites_count = 0,
-    } = user;
+    } = stats || {};
 
     const joinDate = created_at
         ? new Date(created_at).toLocaleDateString("en-GB", {

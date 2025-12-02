@@ -53,7 +53,7 @@ export default function ProfileTabs({ user, activeTab, onTabChange }: ProfileTab
 
             {/* Active Tab Content */}
             <div className="mt-4">
-                {activeTab === "overview" && <OverviewTab user={userData || {}} />}
+                {activeTab === "overview" && <OverviewTab userId={user.id} />}
                 {activeTab === "activity" && <ActivityTab userId={user.id} />}
                 {activeTab === "favorites" && <FavoritesTab userId={user.id} />}
                 {activeTab === "settings" && <SettingsTab user={user} />}

@@ -10,4 +10,7 @@ export type FeaturedSpotlight = {
     priority: number;
     is_active: boolean;
     created_at: string; // ISO timestamp
+    is_new?: boolean; // Badge for new spotlights
+    is_trending?: boolean; // Badge for trending spotlights
+    save_count?: number; // Social proof - number of saves
 };
