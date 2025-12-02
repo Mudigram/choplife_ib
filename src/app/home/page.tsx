@@ -14,7 +14,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { reverseGeocode } from "@/lib/location";
 import { usePopularPlaces } from "@/hooks/usePopularPlaces";
 import { useEventSection } from "@/hooks/useEventSections";
-
+import ViewAll from "@/components/home/ViewAll";
 import { useNearbyPlaces } from "@/hooks/useNearbyPlaces";
 import { useCollectionPlaces } from "@/hooks/useCollectionPlaces";
 import MapView from "@/components/map/MapView";
@@ -161,7 +161,7 @@ export default function HomePage() {
     return (
         <div
             ref={containerRef}
-            className="bg-chop-bg-dark min-h-screen overflow-hidden"
+            className="bg-chop-bg-dark min-h-screen overflow-hidden pb-10"
             style={{ position: 'relative' }}
         >
             {/* Pull-to-Refresh Indicator */}
@@ -191,7 +191,11 @@ export default function HomePage() {
             <IBSpotlight
                 userName={profileData.username}
                 userLocation={locationName} />
-            <div className="p-4 max-w-lg mx-auto">
+
+            <div className="px-6 max-w-lg mx-auto pt-2">
+                <ViewAll />
+            </div>
+            <div className="p-2 max-w-lg mx-auto">
                 <CategoryFilterBar
                     selected={activeCollection}
                     onFilterSelect={(id) => setActiveCollection(id === "all" ? null : (id === activeCollection ? null : id))}

@@ -140,8 +140,38 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  /* Smooth scroll behavior across the entire app */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbar globally while maintaining scroll functionality */
+  html,
+  body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
   body {
     @apply bg-background text-foreground;
+    /* Ensure smooth scrolling on mobile devices */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Apply to all scrollable containers */
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  *::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 }
 
@@ -318,6 +348,16 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: -200% 50%; }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
 
 .before\:animate-spin-slow::before {
   animation: spin-slow 4s linear infinite;
