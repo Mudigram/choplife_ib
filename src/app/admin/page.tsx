@@ -37,27 +37,26 @@ export default function AdminDashboard() {
                     title="Total Places"
                     value={stats.totalPlaces}
                     icon={MapPin}
-                    color="text-orange-400"
+                    color="orange"
                 />
                 <StatCard
                     title="Total Events"
                     value={stats.totalEvents}
                     icon={Calendar}
-                    color="text-pink-400"
+                    color="pink"
                 />
                 <StatCard
                     title="Pending Reviews"
                     value={stats.pendingReviews}
                     icon={MessageSquare}
-                    color="text-blue-400"
-                    trend={stats.pendingReviews > 0 ? `${stats.pendingReviews} to review` : "All caught up"}
-                    trendUp={stats.pendingReviews === 0}
+                    color="blue"
+                    alert={stats.pendingReviews > 0}
                 />
                 <StatCard
                     title="Total Users"
                     value={stats.totalUsers}
                     icon={Users}
-                    color="text-green-400"
+                    color="green"
                 />
             </div>
 

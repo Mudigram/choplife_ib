@@ -7,9 +7,10 @@ import { useRouter } from "next/navigation";
 
 type ProfileHeaderProps = {
     user: Partial<UserProfile>;
+    onEditClick?: () => void;
 };
 
-export default function ProfileHeader({ user }: ProfileHeaderProps) {
+export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps) {
     const router = useRouter();
     const defaultAvatar =
         "https://ui-avatars.com/api/?name=" +
@@ -32,7 +33,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 
                 {/* Settings Icon */}
                 <button
-                    onClick={() => router.push("/settings")}
+                    onClick={onEditClick ? onEditClick : () => router.push("/settings")}
                     className="absolute bottom-0 left-0 bg-chop-bg-dark text-chop-accent-cta rounded-full p-1.5 shadow-md hover:bg-chop-bg-dark/80 transition border border-chop-accent-cta/30 hover:border-chop-accent-cta/50"
                     title="Settings"
                 >

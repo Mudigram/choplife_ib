@@ -6,6 +6,7 @@ import { Search, Bell, ChevronDown, MapPin, SlidersHorizontal } from "lucide-rea
 import { useState } from "react";
 import type { UserProfile } from "@/types/user";
 import LocationSearchModal from "./LocationSearchModal";
+import ComingSoonModal from "../ui/ComingSoonModal";
 import { Button } from "../ui/button";
 import { updateUserLocation } from "@/lib/supabase/updateUserLocation";
 
@@ -19,6 +20,7 @@ export default function HomeHeader({ user, location, onLocationChange }: HomeHea
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentLocation, setCurrentLocation] = useState(location);
     const [hasNotifications, setHasNotifications] = useState(true);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isUpdatingLocation, setIsUpdatingLocation] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
 
@@ -103,8 +105,8 @@ export default function HomeHeader({ user, location, onLocationChange }: HomeHea
                             </button>
 
                             {/* Notification Bell */}
-                            <Link
-                                href="/notifications"
+                            <button
+                                onClick={() => setIsNotificationsOpen(true)}
                                 aria-label="View notifications"
                                 className="p-2 backdrop-blur-md bg-white/10 border border-white/20 rounded-full relative transition-colors hover:bg-white/20"
                             >
@@ -112,7 +114,7 @@ export default function HomeHeader({ user, location, onLocationChange }: HomeHea
                                 {hasNotifications && (
                                     <span className="absolute top-0 right-1 w-3 h-3 bg-chop-accent-cta rounded-full animate-pulse"></span>
                                 )}
-                            </Link>
+                            </button>
                         </div>
                     </div>
 
@@ -149,11 +151,18 @@ export default function HomeHeader({ user, location, onLocationChange }: HomeHea
                     </div>
                 </div>
 
-                {/* Modal */}
+                {/* Modals */}
                 <LocationSearchModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     onLocationSelect={handleLocationSelect}
+                />
+
+                <ComingSoonModal
+                    isOpen={isNotificationsOpen}
+                    onClose={() => setIsNotificationsOpen(false)}
+                    title="Notifications"
+                    message="We're building a notification system to keep you updated on the latest events and offers. Check back soon!"
                 />
             </div>
         </header>

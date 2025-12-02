@@ -11,7 +11,7 @@ type StatCardProps = {
         value: number;
         isPositive: boolean;
     };
-    color?: "orange" | "yellow" | "blue" | "green" | "red";
+    color?: "orange" | "yellow" | "blue" | "green" | "red" | "pink";
     alert?: boolean;
 };
 
@@ -21,6 +21,7 @@ const colorClasses = {
     blue: "text-blue-400 bg-blue-400/10",
     green: "text-green-400 bg-green-400/10",
     red: "text-red-400 bg-red-400/10",
+    pink: "text-pink-400 bg-pink-400/10",
 };
 
 export default function StatCard({
