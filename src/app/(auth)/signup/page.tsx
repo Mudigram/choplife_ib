@@ -21,7 +21,7 @@ function getFriendlyErrorMessage(error: string): string {
         return "Please enter a valid email address.";
     }
     if (error.includes("Password should contain")) {
-        return "Password must contain at least one uppercase letter, one lowercase letter, and one number.";
+        return "Password must contain at least one uppercase letter, one character, one lowercase letter, and one number.";
     }
     if (error.includes("Signup requires a valid password")) {
         return "Please enter a valid password (at least 6 characters).";
