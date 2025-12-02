@@ -20,15 +20,18 @@ export default function ProfileHeader({ user, onEditClick }: ProfileHeaderProps)
     return (
         <div className="w-full sticky top-0 z-10 bg-chop-bg-dark py-6 flex flex-col items-center text-center pb-6 pt-12 ">
             {/* Avatar */}
-            <div className="relative">
-
+            <div className="relative w-[90px] h-[90px] rounded-full overflow-hidden border-2 border-chop-text-light/20 shadow-md">
                 <Image
+                    key={user?.avatar_url} // Force re-render on avatar change
                     src={user?.avatar_url || defaultAvatar}
                     alt="User Avatar"
-                    width={90}
-                    height={90}
-                    className="rounded-full object-cover border-2 border-chop-text-light/20 shadow-md"
+                    fill
+                    unoptimized // Prevent caching issues
+                    className="object-cover"
                 />
+            </div>
+
+            <div className="relative">
 
 
                 {/* Settings Icon */}

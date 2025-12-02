@@ -148,6 +148,16 @@ export default function LoginPage() {
                             </button>
                         </div>
 
+                        {/* Forgot Password Link */}
+                        <div className="text-right -mt-2">
+                            <Link
+                                href="/forgot-password"
+                                className="text-chop-accent-cta text-sm font-medium hover:text-chop-accent-point transition-colors"
+                            >
+                                Forgot Password?
+                            </Link>
+                        </div>
+
                         {/* Error Message */}
                         {error && (
                             <div className="bg-chop-accent-error/10 border border-chop-accent-error/30 rounded-xl p-3 text-chop-accent-error text-sm animate-shake">

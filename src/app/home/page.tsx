@@ -241,6 +241,7 @@ export default function HomePage() {
                                     onItemClick={(item) => router.push(`/events/${item.id}`)}
                                     onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "event" })}
                                     viewAllLink="/events"
+                                    viewAllText="View All Events"
                                 />
                                 {eventsLoading && <Spinner size="lg" message="Loading Events..." />}
                                 {!eventsLoading && eventItems.length === 0 && (
@@ -259,6 +260,7 @@ export default function HomePage() {
                                     onItemClick={(item) => router.push(`/places/${item.id}`)}
                                     onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
                                     viewAllLink="/places"
+                                    viewAllText="View All Places"
                                 />
                                 {popularLoading && <Spinner size="lg" message="Loading Popular Places" full />}
                                 {!popularLoading && items.length === 0 && (
@@ -280,6 +282,7 @@ export default function HomePage() {
                                         onItemClick={(i) => router.push(`/places/${i.id}`)}
                                         onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
                                         viewAllLink="/places"
+                                        viewAllText="View All Restaurants"
                                     />
                                     {nearbyLoading && <p className="text-xs text-center text-gray-500">Finding closest spots...</p>}
                                     {!nearbyLoading && displayItemsWithFavorites.length === 0 && (
@@ -304,7 +307,8 @@ export default function HomePage() {
                                             items={recommendedItems}
                                             onItemClick={(item) => router.push(`/places/${item.id}`)}
                                             onFavoriteToggle={(item) => toggleFavorite({ id: item.id, type: "place" })}
-                                            viewAllLink="/places"
+                                            viewAllText="View All Favorites"
+                                            viewAllLink="/favorites"
                                         />
                                     )}
                                 </div>
