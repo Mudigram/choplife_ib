@@ -25,7 +25,7 @@ export default function HomeHeader({ user, location, onLocationChange }: HomeHea
     const [locationError, setLocationError] = useState<string | null>(null);
 
     const defaultAvatar = "/assets/avatar/lisa.jpg";
-    const defaultHeader = "/assets/header/header1.jpg";
+    const defaultHeader = "/assets/events/events.jpg";
     const [imageError, setImageError] = useState(false);
 
     const handleLocationSelect = async (
