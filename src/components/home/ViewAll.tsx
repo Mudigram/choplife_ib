@@ -20,7 +20,7 @@ export default function ViewAll() {
                 <div
                     className="relative rounded-2xl overflow-hidden"
                     style={{
-                        backgroundImage: `url('/assets/places.jpg')`,
+                        backgroundImage: `url('/assets/events/places.jpg')`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                     }}
@@ -54,7 +54,7 @@ export default function ViewAll() {
                 <div
                     className="relative rounded-2xl overflow-hidden"
                     style={{
-                        backgroundImage: `url('/assets/events.jpg')`,
+                        backgroundImage: `url('/assets/events/events.jpg')`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                     }}
