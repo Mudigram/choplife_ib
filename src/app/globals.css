@@ -55,9 +55,9 @@
   --color-chop-text-subtle: #afafb3;
 
   /* Accent Colors */
-  --color-chop-accent-cta: #f8af2f; /* Ibadan Brown (CTA/Buttons) */
+  --color-chop-accent-cta: #fad01b; /* Ibadan Brown (CTA/Buttons) */
   --color-chop-accent-point: #ffd700; /* Ibadan Gold (Highlights/Vibrancy) */
-  --color-chop-accent-status: #00ffc2; /* Status/Success (UI Feedback) */
+  --color-chop-accent-status: #00deff; /* Status/Success (UI Feedback) */
   --color-chop-accent-error: #ff0099; /* Error/Warning (UI Feedback) */
 
   /* ChopLife Custom Shadows */
